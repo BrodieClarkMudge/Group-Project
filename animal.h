@@ -30,8 +30,8 @@ class Animal {
 
     public:
     Animal();
-    Animal(string species, string resource, int maxHealth,
-        int maxHunger, int maxThirst);
+    Animal(Texture2D texture, string type, string resource,
+        int mHealth, int mHunger, int mThirst);
 
     virtual ~Animal() = default;
 
@@ -49,6 +49,9 @@ class Animal {
     virtual void updateDaily();
     void collectResource();
     bool hasResourceAvailable();
+
+    void setTexture(Texture2D sprite);
+    void draw(int x, int y);
 
 };
 

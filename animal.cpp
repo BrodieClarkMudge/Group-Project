@@ -5,20 +5,21 @@ Animal::Animal(){
 
 }
 
-Animal::Animal(string species, string resource, int maxHealth, int maxHunger, int maxthirst) {
-    species = species;
-    sprite = LoadTexture("assets/cowPixel.png");
-    health = maxHealth;
-    hunger = maxHunger;
-    thirst = maxThirst;
-    maxHealth = maxHealth;
-    maxHunger = maxHunger;
-    maxThirst = maxThirst;
+Animal::Animal(Texture2D texture, string type, string resource,
+    int mHealth, int mHunger, int mThirst) {
+    species = type;
+    sprite = texture;
+    health = mHealth;
+    hunger = mHunger;
+    thirst = mThirst;
+    maxHealth = mHealth;
+    maxHunger = mHunger;
+    maxThirst = mThirst;
     waterConsumption = 10;
     hungerConsumption = 10;
     isAliveState = true;
     timeSinceFed = 0;
-    resource = producesResource;
+    producesResource = resource;
     productionInterval = 10;
     timeSinceLastProduction = 0;
     hasResourceReady = false;
@@ -111,3 +112,13 @@ void Animal::collectResource(){
 bool Animal::hasResourceAvailable(){
     return hasResourceReady;
 };
+
+void Animal::setTexture(Texture2D tex) {
+    sprite = tex;
+}
+
+void Animal::draw(int x, int y) {
+    if (isAliveState) {
+        DrawTexture(sprite, x, y, WHITE);
+    }
+}
