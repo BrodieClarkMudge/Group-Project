@@ -31,9 +31,10 @@ class Animal {
     public:
     Animal();
     Animal(Texture2D texture, string type, string resource,
-        int mHealth, int mHunger, int mThirst);
+    int mHealth, int mHunger, int mThirst, int consHunger,
+    int consThirst, int prodInt);
 
-    virtual ~Animal() = default;
+    virtual ~Animal();
 
     string getState();
     void drink();
@@ -46,12 +47,12 @@ class Animal {
     string getSpecies();
     string getResourceType();
     
-    virtual void updateDaily();
+    virtual void updateDaily() = 0;
     void collectResource();
     bool hasResourceAvailable();
 
     void setTexture(Texture2D sprite);
-    void draw(int x, int y);
+    void draw(float x, float y, float width, float height);
 
 };
 

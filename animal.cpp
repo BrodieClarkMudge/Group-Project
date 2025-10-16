@@ -1,4 +1,5 @@
 #include "animal.h"
+#include "sstream"
 #include <iostream>
 
 Animal::Animal(){
@@ -6,7 +7,8 @@ Animal::Animal(){
 }
 
 Animal::Animal(Texture2D texture, string type, string resource,
-    int mHealth, int mHunger, int mThirst) {
+    int mHealth, int mHunger, int mThirst, int consHunger,
+    int consThirst, int prodInt) {
     species = type;
     sprite = texture;
     health = mHealth;
@@ -15,22 +17,24 @@ Animal::Animal(Texture2D texture, string type, string resource,
     maxHealth = mHealth;
     maxHunger = mHunger;
     maxThirst = mThirst;
-    waterConsumption = 10;
-    hungerConsumption = 10;
+    waterConsumption = consThirst;
+    hungerConsumption = consHunger;
     isAliveState = true;
-    timeSinceFed = 0;
     producesResource = resource;
-    productionInterval = 10;
+    productionInterval = prodInt;
+    timeSinceFed = 0;
     timeSinceLastProduction = 0;
     hasResourceReady = false;
 
 }
 
+    Animal::~Animal() = default;
+
 void Animal::calculateHealth(){
-    if (hunger = 0){
+    if (hunger == 0){
         health = health - 5;
     }
-    if (thirst = 0){
+    if (thirst == 0){
         health = health - 5;
     }
     if (health > 0){
@@ -45,8 +49,13 @@ void Animal::checkSurvival(){
 };
 
 string Animal::getState() {
-    return species, ", HP: ", health, ", Hunger: ", hunger, ", Thirst: ",
-    thirst, (isAlive ? ", Alive" : ", Dead");
+    std::ostringstream oss;
+    oss << species
+        << ", HP: " << health
+        << ", Hunger: " << hunger
+        << ", Thirst: " << thirst
+        << (isAlive() ? ", Alive" : ", Dead");
+    return oss.str();
 };
 
 void Animal::drink(){
@@ -102,7 +111,7 @@ string Animal::getResourceType(){
 };
     
 void Animal::collectResource(){
-    if(hasResourceReady = true) {
+    if(hasResourceReady == true) {
         //********* produced output added to storage*/
         hasResourceReady = false;
         timeSinceLastProduction = 0;
@@ -117,8 +126,18 @@ void Animal::setTexture(Texture2D tex) {
     sprite = tex;
 }
 
-void Animal::draw(int x, int y) {
+void Animal::draw(float x, float y, float width, float height) {
     if (isAliveState) {
-        DrawTexture(sprite, x, y, WHITE);
+        DrawTexturePro(
+            sprite,
+            { 0, 0, static_cast<float>(sprite.width), static_cast<float>(sprite.height) }, // source rect
+            { x, y, width, height },
+            { 0, 0 },
+            0.0f,
+            WHITE
+        );
     }
 }
+
+
+void Animal::updateDaily() {};

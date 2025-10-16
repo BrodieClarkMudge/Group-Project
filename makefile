@@ -21,3 +21,15 @@ square : raylibSquare.cpp
     -framework CoreVideo \
     -framework OpenGL
 	./square
+
+farm : betterfarm.cpp pig.cpp sheep.cpp cow.cpp chicken.cpp animal.cpp
+	clang++ betterfarm.cpp pig.cpp sheep.cpp cow.cpp chicken.cpp animal.cpp -o farm \
+    -std=c++17 \
+    -I/opt/homebrew/include \
+    -L/opt/homebrew/lib \
+    -lraylib \
+    -framework Cocoa \
+    -framework IOKit \
+    -framework CoreVideo \
+    -framework OpenGL
+	./farm
