@@ -200,30 +200,30 @@ int main() {
             }
         }
 
-        // ----------------------
-        // Animal selection keys
-        // ----------------------
+
         if (IsKeyPressed(KEY_ONE)) selectedAnimal = Selected::COW;
         if (IsKeyPressed(KEY_TWO)) selectedAnimal = Selected::SHEEP;
         if (IsKeyPressed(KEY_THREE)) selectedAnimal = Selected::CHICKEN;
         if (IsKeyPressed(KEY_FOUR)) selectedAnimal = Selected::PIG;
 
-        // ----------------------
-        // Placing/removing animals
-        // ----------------------
+
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
             Vector2 mouse = GetMousePosition();
             for (auto& tile : tiles) {
                 if (CheckCollisionPointRec(mouse, tile.rect) && hoeing == false) {
-                    if (tile.type == TileType::YARD) { // ✅ only allow on yard
+                    if (tile.type == TileType::YARD) {
                         if (tile.animal) {
-                            tile.animal.reset(); // remove
+                            tile.animal.reset();
                         } else {
                             switch (selectedAnimal) {
-                                case Selected::COW: tile.animal = std::make_unique<Cow>(cowTex); break;
-                                case Selected::SHEEP: tile.animal = std::make_unique<Sheep>(sheepTex); break;
-                                case Selected::CHICKEN: tile.animal = std::make_unique<Chicken>(chickenTex); break;
-                                case Selected::PIG: tile.animal = std::make_unique<Pig>(pigTex); break;
+                                case Selected::COW: tile.animal = std::make_unique<Cow>(cowTex); 
+                                    break;
+                                case Selected::SHEEP: tile.animal = std::make_unique<Sheep>(sheepTex); 
+                                    break;
+                                case Selected::CHICKEN: tile.animal = std::make_unique<Chicken>(chickenTex); 
+                                    break;
+                                case Selected::PIG: tile.animal = std::make_unique<Pig>(pigTex); 
+                                    break;
                             }
                         }
                     }
@@ -232,15 +232,12 @@ int main() {
         }
 
 
-        // ----------------------
-        // Drawing
-        // ----------------------
+
         BeginDrawing();
         ClearBackground(BLACK); // everything outside grid+bar is black
 
-        // ----------------------
-        // Draw UI Bar above grid
-        // ----------------------
+
+
         Rectangle topBar = { (float)offsetX, (float)(offsetY - barHeight), (float)areaWidth, (float)barHeight };
         DrawRectangleRec(topBar, GOLD);
         DrawRectangleLinesEx(topBar, 2, BROWN);
@@ -276,9 +273,8 @@ int main() {
         int coinX = offsetX + areaWidth - coinTextWidth - 20;
         DrawText(coinText, coinX, topBar.y + 20, 20, BLACK);
 
-        // ----------------------
-        // Draw grid
-        // ----------------------
+
+
         for (auto& tile : tiles) {
             if (tile.type == TileType::GRASS) {
                 DrawTexturePro(grassTex, Rectangle{0, 0, (float)grassTex.width, (float)grassTex.height},
@@ -297,9 +293,8 @@ int main() {
             }
         }
 
-        // ----------------------
-        // Draw instructions at bottom
-        // ----------------------
+
+
         DrawText("1:Cow  2:Sheep  3:Chicken  4:Pig  LMB:Place/Remove", 20, winHeight - 60, 20, RAYWHITE);
         DrawText("Arrow Up/Down: Resize Grid", 20, winHeight - 40, 20, RAYWHITE);
         DrawText("BetterFarm++ OOP (16:10)", 20, winHeight - 20, 20, RAYWHITE);
