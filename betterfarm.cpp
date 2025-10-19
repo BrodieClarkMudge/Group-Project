@@ -36,21 +36,23 @@ void RebuildGrid(std::vector<Tile>& tiles, int cols, int rows,
 
     tiles.clear();
     float tileWidth  = static_cast<float>(areaWidth) / cols;
-    float tileHeight = static_cast<float>(gridHeight) / rows; // ✅ use gridHeight
+    float tileHeight = static_cast<float>(gridHeight) / rows;
 
     for (int y = 0; y < rows; y++) {
         for (int x = 0; x < cols; x++) {
             Tile t;
-            t.rect = { offsetX + x * tileWidth,
-                       offsetY + y * tileHeight,
-                       tileWidth, tileHeight };
+            t.rect = { offsetX + x * tileWidth, offsetY + y * tileHeight,
+                    tileWidth, tileHeight };
+
             int index = y * cols + x;
             if (index < static_cast<int>(oldAnimals.size())) {
                 t.animal = std::move(oldAnimals[index]);
             }
+
             tiles.push_back(std::move(t));
         }
     }
+
 }
 
 
@@ -60,7 +62,7 @@ void ExpandGrid(std::vector<Tile>& tiles, int oldCols, int oldRows,
                 int areaWidth, int gridHeight, int offsetX, int offsetY)
 {
     float tileWidth  = static_cast<float>(areaWidth) / newCols;
-    float tileHeight = static_cast<float>(gridHeight) / newRows; // ✅ use gridHeight
+    float tileHeight = static_cast<float>(gridHeight) / newRows;
 
     std::vector<Tile> newTiles;
     newTiles.reserve(newCols * newRows);
@@ -68,9 +70,9 @@ void ExpandGrid(std::vector<Tile>& tiles, int oldCols, int oldRows,
     for (int y = 0; y < newRows; y++) {
         for (int x = 0; x < newCols; x++) {
             Tile t;
-            t.rect = { offsetX + x * tileWidth,
-                       offsetY + y * tileHeight,
-                       tileWidth, tileHeight };
+            t.rect = { offsetX + x * tileWidth, offsetY + y * tileHeight,
+                    tileWidth, tileHeight };
+
             if (x < oldCols && y < oldRows) {
                 t.animal = std::move(tiles[y * oldCols + x].animal);
             }
@@ -95,6 +97,8 @@ int main() {
 
     SetTargetFPS(60);
 
+    bool hoeing = false;
+
     // ----------------------
     // Show main menu
     // ----------------------
@@ -114,6 +118,7 @@ int main() {
 
     Texture2D coinTex = LoadTexture("assets/coinPixel.png");
     Texture2D hoeTex = LoadTexture("assets/hoePixel.png");
+    Texture2D shopTex = LoadTexture("assets/shopPixel.png");
 
     Texture2D cowTex = LoadTexture("assets/cowPixel.png");
     Texture2D sheepTex = LoadTexture("assets/sheepPixel.png");
@@ -209,7 +214,7 @@ int main() {
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
             Vector2 mouse = GetMousePosition();
             for (auto& tile : tiles) {
-                if (CheckCollisionPointRec(mouse, tile.rect)) {
+                if (CheckCollisionPointRec(mouse, tile.rect) && hoeing == false) {
                     if (tile.type == TileType::YARD) { // ✅ only allow on yard
                         if (tile.animal) {
                             tile.animal.reset(); // remove
@@ -253,6 +258,12 @@ int main() {
             hoe, Vector2{0, 0}, 0.0f, WHITE
         );
 
+        Rectangle shop = { topBar.x + 300, topBar.y + 10, 40, 40};
+        DrawRectangleLinesEx(shop, 2, BROWN);
+        DrawTexturePro(shopTex, Rectangle{-10,-10, (float)shopTex.width+20, (float)shopTex.height+20},
+            shop, Vector2{0, 0}, 0.0f, WHITE
+        );
+
         // Day (centered in bar)
         const char* dayText = TextFormat("Day: %d", currentDay);
         int dayTextWidth = MeasureText(dayText, 20);
@@ -286,19 +297,6 @@ int main() {
             }
         }
 
-        for (auto& tile : tiles) {
-            if (tile.type == TileType::YARD) {
-                DrawRectangleRec(tile.rect, DARKGREEN); // yard
-            } else {
-                DrawRectangleRec(tile.rect, DARKBROWN); // non-yard (blocked)
-            }
-            DrawRectangleLinesEx(tile.rect, 1, BLACK);
-
-            if (tile.animal) {
-                tile.animal->draw(tile.rect.x, tile.rect.y, tile.rect.width, tile.rect.height);
-            }
-        }
-
         // ----------------------
         // Draw instructions at bottom
         // ----------------------
@@ -311,6 +309,23 @@ int main() {
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && CheckCollisionPointRec(mousePos, optionsBackground)) {
             Options option;
             ShowOptions(option);
+        }
+
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && CheckCollisionPointRec(mousePos, hoe)) {
+            hoeing = !hoeing;
+        }
+
+        if(hoeing == true) {
+            DrawTexturePro(
+                hoeTex,
+                Rectangle{0, 0, (float)hoeTex.width, (float)hoeTex.height},
+                Rectangle{mousePos.x, mousePos.y, 80, 80}, Vector2{80 / 2.0f, 80 / 2.0f}, 0.0f, WHITE
+            );
+            for (auto &tile : tiles) {
+                if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && CheckCollisionPointRec(mousePos, tile.rect)) {
+                     tile.type = TileType::HOED;
+                }
+            }
         }
 
         EndDrawing();
