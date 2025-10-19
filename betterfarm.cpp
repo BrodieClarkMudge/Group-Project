@@ -1,0 +1,342 @@
+#include "raylib.h"
+#include "animal.h"
+#include "chicken.h"
+#include "cow.h"
+#include "sheep.h"
+#include "pig.h"
+#include "menu.h"
+#include "options.h"
+
+#include <vector>
+#include <string>
+#include <memory>
+
+// ----------------------
+// Tile holds unique_ptr<Animal>
+// ----------------------
+enum class TileType {GRASS, YARD, HOED};
+
+struct Tile {
+    Rectangle rect;
+    TileType type = TileType::GRASS;
+    std::unique_ptr<Animal> animal = nullptr;
+};
+
+// ----------------------
+// Grid builder
+// ----------------------
+void RebuildGrid(std::vector<Tile>& tiles, int cols, int rows,
+                 int areaWidth, int gridHeight, int offsetX, int offsetY)
+{
+    std::vector<std::unique_ptr<Animal>> oldAnimals;
+    oldAnimals.reserve(tiles.size());
+    for (auto& tile : tiles) {
+        oldAnimals.push_back(std::move(tile.animal));
+    }
+
+    tiles.clear();
+    float tileWidth  = static_cast<float>(areaWidth) / cols;
+    float tileHeight = static_cast<float>(gridHeight) / rows;
+
+    for (int y = 0; y < rows; y++) {
+        for (int x = 0; x < cols; x++) {
+            Tile t;
+            t.rect = { offsetX + x * tileWidth, offsetY + y * tileHeight,
+                    tileWidth, tileHeight };
+
+            int index = y * cols + x;
+            if (index < static_cast<int>(oldAnimals.size())) {
+                t.animal = std::move(oldAnimals[index]);
+            }
+
+            tiles.push_back(std::move(t));
+        }
+    }
+
+}
+
+
+// Expand grid keeping existing animals
+void ExpandGrid(std::vector<Tile>& tiles, int oldCols, int oldRows,
+                int newCols, int newRows,
+                int areaWidth, int gridHeight, int offsetX, int offsetY)
+{
+    float tileWidth  = static_cast<float>(areaWidth) / newCols;
+    float tileHeight = static_cast<float>(gridHeight) / newRows;
+
+    std::vector<Tile> newTiles;
+    newTiles.reserve(newCols * newRows);
+
+    for (int y = 0; y < newRows; y++) {
+        for (int x = 0; x < newCols; x++) {
+            Tile t;
+            t.rect = { offsetX + x * tileWidth, offsetY + y * tileHeight,
+                    tileWidth, tileHeight };
+
+            if (x < oldCols && y < oldRows) {
+                t.animal = std::move(tiles[y * oldCols + x].animal);
+            }
+            newTiles.push_back(std::move(t));
+        }
+    }
+    tiles = std::move(newTiles);
+}
+
+// ----------------------
+// Main
+// ----------------------
+int main() {
+    const int initialWidth = 1280;
+    const int initialHeight = 800;
+    const float aspectRatio = 16.0f / 10.0f;
+    const int barHeight = 60;
+
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+ 
+    InitWindow(initialWidth, initialHeight, "BetterFarm++ OOP (unique_ptr)");
+    SetWindowMinSize(640, 400);
+
+    SetTargetFPS(60);
+
+    bool hoeing = false;
+
+    // ----------------------
+    // Show main menu
+    // ----------------------
+    MainMenu menu;
+    ShowMainMenu(menu);
+
+    int gridCols = 17, gridRows = 10;
+    const int minGrid = 10, maxGrid = 25;
+
+    enum class Selected { COW, SHEEP, CHICKEN, PIG };
+    Selected selectedAnimal = Selected::COW;
+
+    // Load textures
+    Texture2D grassTex = LoadTexture("assets/grassPixel.png");
+    Texture2D yardTex = LoadTexture("assets/yardPixel.png");
+    Texture2D hoedTex = LoadTexture("assets/hoedPixel.png");
+
+    Texture2D coinTex = LoadTexture("assets/coinPixel.png");
+    Texture2D hoeTex = LoadTexture("assets/hoePixel.png");
+    Texture2D shopTex = LoadTexture("assets/shopPixel.png");
+
+    Texture2D cowTex = LoadTexture("assets/cowPixel.png");
+    Texture2D sheepTex = LoadTexture("assets/sheepPixel.png");
+    Texture2D chickenTex = LoadTexture("assets/chickenPixel.png");
+    Texture2D pigTex = LoadTexture("assets/pigPixel.png");
+
+    std::vector<Tile> tiles;
+    int prevCols = gridCols, prevRows = gridRows;
+
+    // ----------------------
+    // UI positions
+    // ----------------------
+    const int uiMargin = 10;
+    int coins = 123;
+    int currentDay = 1;
+
+    while (!WindowShouldClose()) {
+        // Get current screen size
+        int winWidth = GetScreenWidth();
+        int winHeight = GetScreenHeight();
+
+        // Prevent too small
+        if (winWidth < 800 || winHeight < 500) {
+            SetWindowSize((winWidth < 800) ? 800 : winWidth,
+                          (winHeight < 500) ? 500 : winHeight);
+            winWidth = GetScreenWidth();
+            winHeight = GetScreenHeight();
+        }
+
+        int availableWidth  = winWidth;
+        int availableHeight = winHeight;
+
+        // First try: fit width
+        int areaWidth = availableWidth;
+        int areaHeight = (int)(areaWidth / aspectRatio);
+
+        // If too tall for window, fit by height instead
+        if (areaHeight > availableHeight) {
+            areaHeight = availableHeight;
+            areaWidth  = (int)(areaHeight * aspectRatio);
+        }
+
+        // Now split between bar + grid
+        int gridHeight = areaHeight - barHeight;
+
+        // Offsets to center horizontally + vertically
+        int offsetX = (winWidth - areaWidth) / 2;
+        int offsetY = (winHeight - areaHeight) / 2 + barHeight; // grid starts below bar
+
+
+
+        // ----------------------
+        // Grid controls
+        // ----------------------
+        if (IsKeyPressed(KEY_UP) && gridRows < maxGrid && gridCols < maxGrid) {
+            gridRows += 2; gridCols += 3;
+        }
+        if (IsKeyPressed(KEY_DOWN) && gridRows > minGrid && gridCols > minGrid) {
+            gridRows -= 2; gridCols -= 3;
+        }
+
+        if (gridCols != prevCols || gridRows != prevRows || tiles.empty()) {
+            if (!tiles.empty()) {
+                ExpandGrid(tiles, prevCols, prevRows, gridCols, gridRows, areaWidth, areaHeight, offsetX, offsetY);
+            } else {
+                RebuildGrid(tiles, gridCols, gridRows, areaWidth, areaHeight, offsetX, offsetY);
+            }
+            prevCols = gridCols; prevRows = gridRows;
+        } else {
+            // Update rect positions on resize
+            float tileWidth  = static_cast<float>(areaWidth) / gridCols;
+            float tileHeight = static_cast<float>(gridHeight) / gridRows;
+
+            for (int y = 0; y < gridRows; y++) {
+                for (int x = 0; x < gridCols; x++) {
+                    int i = y * gridCols + x;
+                    tiles[i].rect = { offsetX + x * tileWidth, offsetY + y * tileHeight, tileWidth, tileHeight };
+                }
+            }
+        }
+
+
+        if (IsKeyPressed(KEY_ONE)) selectedAnimal = Selected::COW;
+        if (IsKeyPressed(KEY_TWO)) selectedAnimal = Selected::SHEEP;
+        if (IsKeyPressed(KEY_THREE)) selectedAnimal = Selected::CHICKEN;
+        if (IsKeyPressed(KEY_FOUR)) selectedAnimal = Selected::PIG;
+
+
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+            Vector2 mouse = GetMousePosition();
+            for (auto& tile : tiles) {
+                if (CheckCollisionPointRec(mouse, tile.rect) && hoeing == false) {
+                    if (tile.type == TileType::YARD) {
+                        if (tile.animal) {
+                            tile.animal.reset();
+                        } else {
+                            switch (selectedAnimal) {
+                                case Selected::COW: tile.animal = std::make_unique<Cow>(cowTex); 
+                                    break;
+                                case Selected::SHEEP: tile.animal = std::make_unique<Sheep>(sheepTex); 
+                                    break;
+                                case Selected::CHICKEN: tile.animal = std::make_unique<Chicken>(chickenTex); 
+                                    break;
+                                case Selected::PIG: tile.animal = std::make_unique<Pig>(pigTex); 
+                                    break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
+
+        BeginDrawing();
+        ClearBackground(BLACK); // everything outside grid+bar is black
+
+
+
+        Rectangle topBar = { (float)offsetX, (float)(offsetY - barHeight), (float)areaWidth, (float)barHeight };
+        DrawRectangleRec(topBar, GOLD);
+        DrawRectangleLinesEx(topBar, 2, BROWN);
+
+        // Options (top-left inside bar)
+        Rectangle optionsBackground = { topBar.x + 10, topBar.y + 10, 120, 40 };
+        DrawRectangleRec(optionsBackground, GOLD);
+        DrawRectangleLinesEx(optionsBackground, 2, BROWN);
+        DrawText("Options", (int)optionsBackground.x + 10, (int)optionsBackground.y + 10, 20, BLACK);
+
+        //hoe rectangle
+        Rectangle hoe = { topBar.x + 160, topBar.y + 10, 40, 40};
+        DrawRectangleLinesEx(hoe, 2, BROWN);
+        DrawTexturePro(hoeTex, Rectangle{0,0, (float)hoeTex.width, (float)hoeTex.height},
+            hoe, Vector2{0, 0}, 0.0f, WHITE
+        );
+
+        Rectangle shop = { topBar.x + 300, topBar.y + 10, 40, 40};
+        DrawRectangleLinesEx(shop, 2, BROWN);
+        DrawTexturePro(shopTex, Rectangle{-10,-10, (float)shopTex.width+20, (float)shopTex.height+20},
+            shop, Vector2{0, 0}, 0.0f, WHITE
+        );
+
+        // Day (centered in bar)
+        const char* dayText = TextFormat("Day: %d", currentDay);
+        int dayTextWidth = MeasureText(dayText, 20);
+        int dayX = offsetX + areaWidth/2 - dayTextWidth/2;
+        DrawText(dayText, dayX, topBar.y + 20, 20, BLACK);
+
+        // Coins (top-right inside bar)
+        const char* coinText = TextFormat("Coins: %d", coins);
+        int coinTextWidth = MeasureText(coinText, 20);
+        int coinX = offsetX + areaWidth - coinTextWidth - 20;
+        DrawText(coinText, coinX, topBar.y + 20, 20, BLACK);
+
+
+
+        for (auto& tile : tiles) {
+            if (tile.type == TileType::GRASS) {
+                DrawTexturePro(grassTex, Rectangle{0, 0, (float)grassTex.width, (float)grassTex.height},
+                tile.rect, Vector2{0, 0}, 0.0f, WHITE);
+            } else if (tile.type == TileType::YARD) {
+                DrawTexturePro(yardTex, Rectangle{0, 0, (float)yardTex.width, (float)yardTex.height},
+                tile.rect, Vector2{0, 0}, 0.0f, WHITE);
+            } else if (tile.type == TileType::HOED) {
+                DrawTexturePro(hoedTex, Rectangle{0, 0, (float)hoedTex.width, (float)hoedTex.height},
+                tile.rect, Vector2{0, 0}, 0.0f, WHITE);
+            }
+
+            DrawRectangleLinesEx(tile.rect, 1, BLACK);
+            if (tile.animal) {
+                tile.animal->draw(tile.rect.x, tile.rect.y, tile.rect.width, tile.rect.height);
+            }
+        }
+
+
+
+        DrawText("1:Cow  2:Sheep  3:Chicken  4:Pig  LMB:Place/Remove", 20, winHeight - 60, 20, RAYWHITE);
+        DrawText("Arrow Up/Down: Resize Grid", 20, winHeight - 40, 20, RAYWHITE);
+        DrawText("BetterFarm++ OOP (16:10)", 20, winHeight - 20, 20, RAYWHITE);
+
+        Vector2 mousePos = GetMousePosition();
+
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && CheckCollisionPointRec(mousePos, optionsBackground)) {
+            Options option;
+            ShowOptions(option);
+        }
+
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && CheckCollisionPointRec(mousePos, hoe)) {
+            hoeing = !hoeing;
+        }
+
+        if(hoeing == true) {
+            DrawTexturePro(
+                hoeTex,
+                Rectangle{0, 0, (float)hoeTex.width, (float)hoeTex.height},
+                Rectangle{mousePos.x, mousePos.y, 80, 80}, Vector2{80 / 2.0f, 80 / 2.0f}, 0.0f, WHITE
+            );
+            for (auto &tile : tiles) {
+                if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && CheckCollisionPointRec(mousePos, tile.rect)) {
+                     tile.type = TileType::HOED;
+                }
+            }
+        }
+
+        EndDrawing();
+        
+    }
+
+    // ----------------------
+    // Cleanup
+    // ----------------------
+    UnloadTexture(cowTex);
+    UnloadTexture(sheepTex);
+    UnloadTexture(chickenTex);
+    UnloadTexture(pigTex);
+    UnloadTexture(grassTex);
+
+    CloseWindow();
+    return 0;
+}
