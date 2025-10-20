@@ -6,11 +6,11 @@ void ShowMainMenu(MainMenu &menu) {
     const int menuHeight = 300;
 
     int menuX = (GetScreenWidth()  - menuWidth)  / 2;
-    int menuY = (GetScreenHeight() - menuHeight) / 2;
+    int menuY = (GetScreenHeight() - menuHeight) / 2 + 60;
 
     Rectangle menuRect = { (float)menuX, (float)menuY, (float)menuWidth, (float)menuHeight };
     Rectangle soundRect = { menuRect.x + 50, menuRect.y + 50, 300, 50 };
-    Rectangle sliderRect = { menuRect.x + 50, menuRect.y + 120, 300, 20 }; // slider background
+    Rectangle sliderRect = { menuRect.x + 50, menuRect.y + 160, 300, 20 }; // slider background
 
     bool draggingSlider = false;
 
@@ -66,7 +66,10 @@ void ShowMainMenu(MainMenu &menu) {
 
         DrawText(TextFormat("Timescale: %.2fx", menu.timeScale), sliderRect.x, sliderRect.y - 30, 20, BLACK);
 
-        DrawText("Press ENTER to start", menuRect.x + 80, menuRect.y + 220, 20, BLACK);
+        DrawText("Welcome To", menuRect.x + 80, menuRect.y - 200, 40, DARKBROWN);
+        DrawText("BETTERFARM++", menuRect.x - 185, menuRect.y - 160, 100, DARKGREEN);
+        
+        DrawText("Press ENTER to start", menuRect.x + 65, menuRect.y + 220, 20, BLACK);
 
         if (IsKeyPressed(KEY_ENTER)) break;
 

@@ -1,74 +1,71 @@
 #include "shop.h"
-#include "raylib.h"
+#include <string>
 
-void ShowShop(Shop &shop) {
-    const int shopWidth = 400;
-    const int shopHeight = 300;
+Shop::Shop() {
+    open = false;
+    buttonWidth = 200;
+    buttonHeight = 40;
+    windowRect = { 300, 150, 400, 400 }; // Example window size
+    FarmTextures tex = LoadFarmTextures();
+}
 
-    int shopX = (GetScreenWidth()  - shopWidth)  / 2;
-    int shopY = (GetScreenHeight() - shopHeight) / 2;
+void Shop::Update(std::vector<Tile>& tiles, int& coins,
+                  Texture2D& yardTex, Texture2D& cowTex, Texture2D& sheepTex,
+                  Texture2D& chickenTex, Texture2D& pigTex) {
+    if (!open) return;
 
-    Rectangle shopRect = { (float)shopX, (float)shopY, (float)shopWidth, (float)shopHeight };
-    Rectangle soundRect = { shopRect.x + 50, shopRect.y + 50, 300, 50 };
-    Rectangle sliderRect = { shopRect.x + 50, shopRect.y + 120, 300, 20 }; // slider background
+    Vector2 mousePos = GetMousePosition();
 
-    bool draggingSlider = false;
-
-    while (!WindowShouldClose()) {
-        int winWidth = GetScreenWidth();
-        int winHeight = GetScreenHeight();
-
-        if (winWidth < 800 || winHeight < 500) {
-            SetWindowSize((winWidth < 800) ? 800 : winWidth,
-                          (winHeight < 500) ? 500 : winHeight);
+    // Yard button
+    Rectangle yardBtn = { windowRect.x + 20, windowRect.y + 50, (float)buttonWidth, (float)buttonHeight };
+    if (CheckCollisionPointRec(mousePos, yardBtn) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+        if (coins >= 20) {
+            // Prepare placement logic in main (not here)
+            selectedItem = "YARD";  // store what the user clicked
+            open = false;           // close shop immediately
         }
-        
-        Vector2 mousePos = GetMousePosition();
-
-        // Start dragging when mouse pressed on slider
-        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && CheckCollisionPointRec(mousePos, sliderRect)) {
-            draggingSlider = true;
-        }
-        if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
-            draggingSlider = false;
-        }
-
-        // Update timeScale if dragging
-        if (draggingSlider) {
-            float newX = mousePos.x;
-            if (newX < sliderRect.x) newX = sliderRect.x;
-            if (newX > sliderRect.x + sliderRect.width) newX = sliderRect.x + sliderRect.width;
-
-            float tNorm = (newX - sliderRect.x) / sliderRect.width; // 0..1
-            shop.timeScale = 0.5f + tNorm * (2.0f - 0.5f); // map to 0.5x - 2.0x
-        }
-
-        BeginDrawing();
-
-        // Draw shop background
-        DrawRectangleRec(shopRect, LIGHTGRAY);
-
-        // Draw sound toggle
-        DrawRectangleRec(soundRect, DARKGRAY);
-        DrawText(shop.soundFX ? "Sound FX: ON" : "Sound FX: OFF", soundRect.x + 10, soundRect.y + 10, 20, WHITE);
-        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && CheckCollisionPointRec(mousePos, soundRect)) {
-            shop.soundFX = !shop.soundFX;
-        }
-
-        // Draw timeScale slider
-        DrawRectangleRec(sliderRect, DARKGRAY);
-
-        // Knob
-        float knobX = sliderRect.x + ((shop.timeScale - 0.5f) / (2.0f - 0.5f)) * sliderRect.width;
-        Rectangle knobRect = { knobX - 10, sliderRect.y - 5, 20, 30 };
-        DrawRectangleRec(knobRect, RED);
-
-        DrawText(TextFormat("Timescale: %.2fx", shop.timeScale), sliderRect.x, sliderRect.y - 30, 20, BLACK);
-
-        DrawText("Press ENTER to start", shopRect.x + 80, shopRect.y + 220, 20, BLACK);
-
-        if (IsKeyPressed(KEY_ENTER)) break;
-
-        EndDrawing();
     }
+
+    // Cow button
+    Rectangle cowBtn = { windowRect.x + 20, windowRect.y + 100, (float)buttonWidth, (float)buttonHeight };
+    if (CheckCollisionPointRec(mousePos, cowBtn) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && coins >= 50) {
+        selectedItem = "COW";
+        open = false;
+    }
+
+    // Sheep button
+    Rectangle sheepBtn = { windowRect.x + 20, windowRect.y + 150, (float)buttonWidth, (float)buttonHeight };
+    if (CheckCollisionPointRec(mousePos, sheepBtn) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && coins >= 40) {
+        selectedItem = "SHEEP";
+        open = false;
+    }
+
+    // Chicken button
+    Rectangle chickenBtn = { windowRect.x + 20, windowRect.y + 200, (float)buttonWidth, (float)buttonHeight };
+    if (CheckCollisionPointRec(mousePos, chickenBtn) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && coins >= 30) {
+        selectedItem = "CHICKEN";
+        open = false;
+    }
+
+    // Pig button
+    Rectangle pigBtn = { windowRect.x + 20, windowRect.y + 250, (float)buttonWidth, (float)buttonHeight };
+    if (CheckCollisionPointRec(mousePos, pigBtn) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && coins >= 60) {
+        selectedItem = "PIG";
+        open = false;
+    }
+}
+
+
+void Shop::Draw() {
+    if (!open) return;
+
+    DrawRectangleRec(windowRect, RAYWHITE);
+    DrawRectangleLinesEx(windowRect, 2, BLACK);
+
+    DrawText("Shop", windowRect.x + 150, windowRect.y + 10, 30, BLACK);
+    DrawText("Buy Yard - 20 coins", windowRect.x + 30, windowRect.y + 60, 20, DARKGREEN);
+    DrawText("Buy Cow - 50 coins", windowRect.x + 30, windowRect.y + 110, 20, BROWN);
+    DrawText("Buy Sheep - 40 coins", windowRect.x + 30, windowRect.y + 160, 20, GRAY);
+    DrawText("Buy Chicken - 30 coins", windowRect.x + 30, windowRect.y + 210, 20, DARKGRAY);
+    DrawText("Buy Pig - 60 coins", windowRect.x + 30, windowRect.y + 260, 20, MAROON);
 }
