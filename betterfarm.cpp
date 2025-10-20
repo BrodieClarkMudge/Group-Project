@@ -22,8 +22,9 @@ int main() {
     const int barHeight = 60;
 
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-    SetWindowMinSize(640, 400);
+ 
     InitWindow(initialWidth, initialHeight, "BetterFarm++ OOP (unique_ptr)");
+    SetWindowMinSize(640, 400);
 
     SetTargetFPS(60);
 
