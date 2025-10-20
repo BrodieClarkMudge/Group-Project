@@ -22,8 +22,8 @@ int main() {
   float dayTimer = 0.0f;
   float cropTimer = 0.0f;
 
-  float dayLength = 12.0f;  // 🌞 1 in-game day = 12 real seconds
-  float growEvery = 6.0f;   // 🌱 crops grow every 6 seconds
+  float dayLength = 12.0f;  // 1 in-game day = 12 real seconds
+  float growEvery = 6.0f;   //  crops grow every 6 seconds
   float timeScale = 1.0f;   // speed up/slow down time if needed
 
   // Colors
@@ -37,15 +37,15 @@ int main() {
   Color redCol = {180, 50, 50, 255};
 
   while (!window.ShouldClose()) {
-    // 🕒 Update timers
+    //  Update timers
     dt = GetFrameTime() * timeScale;
     dayTimer += dt;
 
-    // 🌿 apply season multiplier to crop growth
+    //  apply season multiplier to crop growth
     float multiplier = weatherSystem.getCurrentSeason()->getGrowthMultiplier();
     cropTimer += dt * multiplier;
 
-    // 🌤️ Advance to next day
+    //  Advance to next day
     if (dayTimer >= dayLength) {
       weatherSystem.updateDaily();
       dayTimer = 0.0f;
@@ -53,7 +53,7 @@ int main() {
 
     // 🌱 Trigger crop growth
     if (cropTimer >= growEvery) {
-      // crop->Grow();  // 👈 integrate this with your real crop object
+      // crop->Grow();  // integrate this with your real crop object
       cropTimer = 0.0f;
     }
 
@@ -68,7 +68,7 @@ int main() {
     // Divider line
     DrawLine(210, 50, 210, 240, border);
 
-    // ---------------- LEFT SIDE: WEATHER ----------------
+    //  LEFT SIDE: WEATHER 
     std::string weather = weatherSystem.getCurrentWeather();
     int weatherTextWidth = MeasureText(weather.c_str(), 28);
     DrawText(weather.c_str(), 30 + (160 - weatherTextWidth) / 2, 100, 28,
@@ -78,7 +78,7 @@ int main() {
     int dayWidth = MeasureText(dayStr.c_str(), 20);
     DrawText(dayStr.c_str(), 30 + (160 - dayWidth) / 2, 145, 20, subText);
 
-    // ---------------- RIGHT SIDE: SEASON INFO ----------------
+    //  RIGHT SIDE: SEASON INFO 
     auto* season = weatherSystem.getCurrentSeason();
     std::string seasonLabel = "Season: " + season->getName();
     int seasonWidth = MeasureText(seasonLabel.c_str(), 22);
@@ -90,7 +90,7 @@ int main() {
     DrawText(TextFormat("Wither: %.0f%%", season->getWitheringChance() * 100),
              230, 165, 20, redCol);
 
-    // ---------------- FOOTER ----------------
+    // FOOTER    
     DrawText(
         TextFormat("[Day: %.1fs | Crop: %.1fs x%.1f]", dayLength - dayTimer,
                    growEvery - cropTimer, multiplier),
