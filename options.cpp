@@ -2,6 +2,7 @@
 #include "raylib.h"
 
 void ShowOptions(Options &options) {
+
     const int optionsWidth = 400;
     const int optionsHeight = 300;
 
@@ -10,9 +11,8 @@ void ShowOptions(Options &options) {
 
     Rectangle optionsRect = { (float)optionsX, (float)optionsY, (float)optionsWidth, (float)optionsHeight };
     Rectangle soundRect = { optionsRect.x + 50, optionsRect.y + 50, 300, 50 };
-    Rectangle sliderRect = { optionsRect.x + 50, optionsRect.y + 120, 300, 20 }; // slider background
+    Rectangle sliderRect = { optionsRect.x + 50, optionsRect.y + 160, 300, 20 }; // slider background
 
-    bool draggingSlider = false;
 
     while (!WindowShouldClose()) {
         int winWidth = GetScreenWidth();
@@ -27,14 +27,14 @@ void ShowOptions(Options &options) {
 
         // Start dragging when mouse pressed on slider
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && CheckCollisionPointRec(mousePos, sliderRect)) {
-            draggingSlider = true;
+            options.draggingSlider = true;
         }
         if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
-            draggingSlider = false;
+            options.draggingSlider = false;
         }
 
         // Update timeScale if dragging
-        if (draggingSlider) {
+        if (options.draggingSlider) {
             float newX = mousePos.x;
             if (newX < sliderRect.x) newX = sliderRect.x;
             if (newX > sliderRect.x + sliderRect.width) newX = sliderRect.x + sliderRect.width;
@@ -65,9 +65,12 @@ void ShowOptions(Options &options) {
 
         DrawText(TextFormat("Timescale: %.2fx", options.timeScale), sliderRect.x, sliderRect.y - 30, 20, BLACK);
 
-        DrawText("Press ENTER to start", optionsRect.x + 80, optionsRect.y + 220, 20, BLACK);
+        DrawText("Press ENTER to continue", optionsRect.x + 65, optionsRect.y + 220, 20, BLACK);
 
-        if (IsKeyPressed(KEY_ENTER)) break;
+        if (IsKeyPressed(KEY_ENTER)) {
+            break;
+        }
+
 
         EndDrawing();
     }

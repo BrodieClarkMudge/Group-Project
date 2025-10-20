@@ -22,8 +22,8 @@ square : raylibSquare.cpp
     -framework OpenGL
 	./square
 
-farm : betterfarm.cpp pig.cpp sheep.cpp cow.cpp chicken.cpp animal.cpp menu.cpp options.cpp
-	clang++ betterfarm.cpp pig.cpp sheep.cpp cow.cpp chicken.cpp animal.cpp menu.cpp options.cpp -o farm \
+farm : betterfarm.cpp pig.cpp sheep.cpp cow.cpp chicken.cpp animal.cpp menu.cpp options.cpp grid.cpp shop.cpp ui.cpp
+	clang++ betterfarm.cpp pig.cpp sheep.cpp cow.cpp chicken.cpp animal.cpp menu.cpp options.cpp grid.cpp shop.cpp ui.cpp -o farm \
     -std=c++17 \
     -I/opt/homebrew/include \
     -L/opt/homebrew/lib \

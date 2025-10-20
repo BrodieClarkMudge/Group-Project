@@ -1,4 +1,5 @@
 #include "raylib.h"
+#include "grid.h"
 #include "animal.h"
 #include "chicken.h"
 #include "cow.h"
@@ -6,6 +7,8 @@
 #include "pig.h"
 #include "menu.h"
 #include "options.h"
+#include "shop.h"
+#include "ui.h"
 // Crops
 #include "Crop.h"
 #include "Regenerating.h"
@@ -116,6 +119,7 @@ int main() {
     SetTargetFPS(60);
 
     bool hoeing = false;
+    Shop shop;
 
     // ----------------------
     // Show main menu
@@ -136,7 +140,14 @@ int main() {
     SelectedCrop selectedCrop = SelectedCrop::BERRY;
 
 
-    // Load textures
+    // crops
+    enum class SelectedCrop { BERRY, POTATO, PUMPKIN };
+    SelectedCrop selectedCrop = SelectedCrop::BERRY;
+
+
+    FarmTextures tex = LoadFarmTextures();
+
+// Load textures
     Texture2D grassTex = LoadTexture("assets/grassPixel.png");
     Texture2D yardTex = LoadTexture("assets/yardPixel.png");
     Texture2D hoedTex = LoadTexture("assets/hoedPixel.png");
@@ -157,7 +168,7 @@ int main() {
     // UI positions
     // ----------------------
     const int uiMargin = 10;
-    int coins = 123;
+    int coins = 150;
     int currentDay = 1;
 
     while (!WindowShouldClose()) {
@@ -312,6 +323,41 @@ int main() {
 
 
 
+
+
+
+// Shop
+if (!shop.open && !shop.selectedItem.empty()) {
+    Vector2 mouse = GetMousePosition();
+    for (auto& tile : tiles) {
+        if (CheckCollisionPointRec(mouse, tile.rect)) {
+            if (shop.selectedItem == "YARD" && tile.type == TileType::GRASS && coins >= 20) {
+                tile.type = TileType::HOED;
+                coins -= 20;
+            }
+            else if (shop.selectedItem == "COW" && tile.type == TileType::YARD && !tile.animal && coins >= 50) {
+                tile.animal = std::make_unique<Cow>(tex.cowTex);
+                coins -= 50;
+            }
+            else if (shop.selectedItem == "SHEEP" && tile.type == TileType::YARD && !tile.animal && coins >= 40) {
+                tile.animal = std::make_unique<Sheep>(tex.sheepTex);
+                coins -= 40;
+            }
+            else if (shop.selectedItem == "CHICKEN" && tile.type == TileType::YARD && !tile.animal && coins >= 30) {
+                tile.animal = std::make_unique<Chicken>(tex.chickenTex);
+                coins -= 30;
+            }
+            else if (shop.selectedItem == "PIG" && tile.type == TileType::YARD && !tile.animal && coins >= 60) {
+                tile.animal = std::make_unique<Pig>(tex.pigTex);
+                coins -= 60;
+            }
+
+            shop.selectedItem.clear(); // item placed, reset selection
+            break;
+        }
+    }
+}
+
         BeginDrawing();
         ClearBackground(BLACK); // everything outside grid+bar is black
 
@@ -330,14 +376,14 @@ int main() {
         //hoe rectangle
         Rectangle hoe = { topBar.x + 160, topBar.y + 10, 40, 40};
         DrawRectangleLinesEx(hoe, 2, BROWN);
-        DrawTexturePro(hoeTex, Rectangle{0,0, (float)hoeTex.width, (float)hoeTex.height},
+        DrawTexturePro(tex.hoeTex, Rectangle{0,0, (float)tex.hoeTex.width, (float)tex.hoeTex.height},
             hoe, Vector2{0, 0}, 0.0f, WHITE
         );
 
-        Rectangle shop = { topBar.x + 300, topBar.y + 10, 40, 40};
-        DrawRectangleLinesEx(shop, 2, BROWN);
-        DrawTexturePro(shopTex, Rectangle{-10,-10, (float)shopTex.width+20, (float)shopTex.height+20},
-            shop, Vector2{0, 0}, 0.0f, WHITE
+        Rectangle shopUI = { topBar.x + 300, topBar.y + 10, 40, 40};
+        DrawRectangleLinesEx(shopUI, 2, BROWN);
+        DrawTexturePro(tex.shopTex, Rectangle{-10,-10, (float)tex.shopTex.width+20, (float)tex.shopTex.height+20},
+            shopUI, Vector2{0, 0}, 0.0f, WHITE
         );
 
         // Day (centered in bar)
@@ -356,13 +402,13 @@ int main() {
 
         for (auto& tile : tiles) {
             if (tile.type == TileType::GRASS) {
-                DrawTexturePro(grassTex, Rectangle{0, 0, (float)grassTex.width, (float)grassTex.height},
+                DrawTexturePro(tex.grassTex, Rectangle{0, 0, (float)tex.grassTex.width, (float)tex.grassTex.height},
                 tile.rect, Vector2{0, 0}, 0.0f, WHITE);
             } else if (tile.type == TileType::YARD) {
-                DrawTexturePro(yardTex, Rectangle{0, 0, (float)yardTex.width, (float)yardTex.height},
+                DrawTexturePro(tex.yardTex, Rectangle{0, 0, (float)tex.yardTex.width, (float)tex.yardTex.height},
                 tile.rect, Vector2{0, 0}, 0.0f, WHITE);
             } else if (tile.type == TileType::HOED) {
-                DrawTexturePro(hoedTex, Rectangle{0, 0, (float)hoedTex.width, (float)hoedTex.height},
+                DrawTexturePro(tex.hoedTex, Rectangle{0, 0, (float)tex.hoedTex.width, (float)tex.hoedTex.height},
                 tile.rect, Vector2{0, 0}, 0.0f, WHITE);
             }
 
@@ -403,19 +449,27 @@ int main() {
             ShowOptions(option);
         }
 
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && CheckCollisionPointRec(mousePos, shopUI)) {
+            shop.Open();
+        }
+
+        shop.Update(tiles, coins, tex.yardTex, tex.cowTex, tex.sheepTex, tex.chickenTex, tex.pigTex);
+        shop.Draw();
+
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && CheckCollisionPointRec(mousePos, hoe)) {
             hoeing = !hoeing;
         }
 
         if(hoeing == true) {
             DrawTexturePro(
-                hoeTex,
-                Rectangle{0, 0, (float)hoeTex.width, (float)hoeTex.height},
+                tex.hoeTex,
+                Rectangle{0, 0, (float)tex.hoeTex.width, (float)tex.hoeTex.height},
                 Rectangle{mousePos.x, mousePos.y, 80, 80}, Vector2{80 / 2.0f, 80 / 2.0f}, 0.0f, WHITE
             );
             for (auto &tile : tiles) {
-                if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && CheckCollisionPointRec(mousePos, tile.rect)) {
+                if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && tile.type == TileType::GRASS && CheckCollisionPointRec(mousePos, tile.rect)) {
                      tile.type = TileType::HOED;
+                     coins = coins - 5;
                 }
             }
         }
@@ -427,11 +481,7 @@ int main() {
     // ----------------------
     // Cleanup
     // ----------------------
-    UnloadTexture(cowTex);
-    UnloadTexture(sheepTex);
-    UnloadTexture(chickenTex);
-    UnloadTexture(pigTex);
-    UnloadTexture(grassTex);
+    UnloadFarmTextures(tex);
 
     CloseWindow();
     return 0;
