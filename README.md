@@ -6,7 +6,7 @@ first created and unit tested in this branch
 How to run
 
 WSL/Linux:
-    make -f Makefile.linux
+    make -f makefile.linux
 
 macOS:
     make -f Makefile.mac

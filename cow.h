@@ -9,7 +9,7 @@ class Cow : public Animal {
 
     public:
     Cow(Texture2D cowText);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
-    void updateDaily() override;
+    //void updateDaily() override;
 };
 
 #endif

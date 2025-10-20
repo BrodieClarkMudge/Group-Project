@@ -9,7 +9,7 @@ class Chicken : public Animal {
 
     public:
     Chicken(Texture2D chickenText);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
-    void updateDaily() override;
+    //void updateDaily() override;
 };
 
 #endif

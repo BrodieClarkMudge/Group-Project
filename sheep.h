@@ -8,8 +8,8 @@ class Sheep : public Animal {
     Texture2D sheepTex = LoadTexture("assets/sheepPixel.png");
 
     public:
-    Sheep(Texture2D sheepText);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
-    void updateDaily() override;
+    Sheep(Texture2D sheepText); 
+    
 };
 
 #endif

@@ -1,12 +1,12 @@
 #ifndef PUMPKIN_H
 #define PUMPKIN_H
 
-#include "Large.h"
+#include "Withering.h"
 
-class Pumpkin : public Large {
+class Pumpkin : public Withering {
 public:
     Pumpkin(float dt);
-    ~Pumpkin();
+    ~Pumpkin() override;
 
     int GetSellPrice() override;
 };

@@ -4,7 +4,7 @@
 Pig::Pig(Texture2D pigText)
     : Animal(pigText, "Pig", "Bacon", 150, 80, 100, 5, 5, 100)
 {};
-
+/*
 void Pig::updateDaily() {
     hunger += hungerConsumption;
     thirst += waterConsumption;
@@ -18,3 +18,4 @@ void Pig::updateDaily() {
         hasResourceReady = true;
     }
 }
+    */

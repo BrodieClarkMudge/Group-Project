@@ -28,6 +28,7 @@ class Animal {
     void calculateHealth();
     void checkSurvival();
 
+
     public:
     Animal();
     Animal(Texture2D texture, string type, string resource,
@@ -42,18 +43,19 @@ class Animal {
     void eat();
     bool needsFood();
     int getHealth();
+    int getThirst();
     bool isAlive();
 
     string getSpecies();
     string getResourceType();
-    
-    virtual void updateDaily() = 0;
+
+
     void collectResource();
     bool hasResourceAvailable();
 
     void setTexture(Texture2D sprite);
     void draw(float x, float y, float width, float height);
-
+    void setThirst(int);
 };
 
 #endif //ANIMAL_H

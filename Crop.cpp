@@ -13,9 +13,9 @@
 Crop::Crop(float dt){
     dtPlanted = dt; // records time of creation for growth calculations
     stage = SEED;
-    water = 0;
+    waterAmount = 0;
     isWatered = false;
-    waterConsumption = 10;
+    waterConsumption = 100;
     
     // make the texture array empty, to be filled in gameloop where textures are loaded
     for (int i = 0; i < 4; i ++) {
@@ -51,8 +51,26 @@ Crop::~Crop() = default;
         }
         
 
+        void Crop::Water() {
+            waterAmount = 100;
+            isWatered = true;
+        }
 
+        int Crop::getWaterAmount() {
+            return waterAmount;
+        }
 
+        void Crop::SetWaterAmount(int x) {
+            waterAmount = x;
+            if (waterAmount < 0) waterAmount = 0;
+        }
+        int Crop::getWaterConsumption() {
+            return waterConsumption;
+        }
+
+        bool Crop::IsWithering() {
+            return false;
+        }
 
 
 

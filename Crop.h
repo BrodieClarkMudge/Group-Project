@@ -21,7 +21,7 @@ class Crop {
     float dtPlanted; // time of creation
     //float timer;  
     bool isWatered;
-    int water;
+    int waterAmount;
     int waterConsumption;
 
 
@@ -33,16 +33,21 @@ class Crop {
     virtual void Draw(Rectangle area);
     // returns true if crop is kept, false if removed
     virtual bool Harvest(int& payout) = 0;
-
+    void Water();
     
     // gets and sets
 
     CropStage GetStage() const;
-    bool      IsMature() const;
-    void      SetTexture(CropStage s, Texture2D tex);
-    virtual int  GetSellPrice() = 0;
+    bool IsMature() const;
+    void SetTexture(CropStage s, Texture2D tex);
+    virtual int GetSellPrice() = 0;
 
+    int getWaterAmount();
 
+    void SetWaterAmount(int x);
+    int getWaterConsumption();
+
+    virtual bool IsWithering();
 
 
 

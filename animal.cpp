@@ -7,18 +7,17 @@ Animal::Animal(){
 }
 
 Animal::Animal(Texture2D texture, string type, string resource,
-    int mHealth, int mHunger, int mThirst, int consHunger,
-    int consThirst, int prodInt) {
+    int mHealth, int mHunger, int mThirst, int consThirst, int consHunger, int prodInt) {
     species = type;
     sprite = texture;
     health = mHealth;
-    hunger = mHunger;
-    thirst = mThirst;
+    hunger = 0;
+    thirst = 0;
+    maxThirst = 100;
     maxHealth = mHealth;
     maxHunger = mHunger;
     maxThirst = mThirst;
-    waterConsumption = consThirst;
-    hungerConsumption = consHunger;
+    waterConsumption = 10;
     isAliveState = true;
     producesResource = resource;
     productionInterval = prodInt;
@@ -58,15 +57,7 @@ string Animal::getState() {
     return oss.str();
 };
 
-void Animal::drink(){
-    if (thirst > 0) {
-        thirst = thirst - waterConsumption;
-        checkSurvival();
-    }
-    else {
-        checkSurvival();
-    }
-};
+
 
 bool Animal::needsWater(){
     if (thirst >= maxThirst/4) {
@@ -140,4 +131,17 @@ void Animal::draw(float x, float y, float width, float height) {
 }
 
 
-void Animal::updateDaily() {};
+void Animal::drink() {
+    thirst = maxThirst;
+    thirst = 100;
+}
+
+int Animal::getThirst() {
+    return thirst;
+}
+
+void Animal::setThirst(int x) {
+    if (thirst != 0) {
+    thirst = x;
+    }
+}
