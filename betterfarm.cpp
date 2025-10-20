@@ -32,75 +32,9 @@ float timeScale = 1.0; //
 // ----------------------
 // Tile holds unique_ptr<Animal>
 // ----------------------
-enum class TileType {GRASS, YARD, HOED};
-
-struct Tile {
-    Rectangle rect;
-    TileType type = TileType::GRASS;
-    std::unique_ptr<Animal> animal = nullptr;
-    std::unique_ptr<Crop> crop = nullptr;
-    float cropTimer = 0.0;   // seconds since last stage growth
-};
-
-// ----------------------
-// Grid builder
-// ----------------------
-void RebuildGrid(std::vector<Tile>& tiles, int cols, int rows,
-                 int areaWidth, int gridHeight, int offsetX, int offsetY)
-{
-    std::vector<std::unique_ptr<Animal>> oldAnimals;
-    oldAnimals.reserve(tiles.size());
-    for (auto& tile : tiles) {
-        oldAnimals.push_back(std::move(tile.animal));
-    }
-
-    tiles.clear();
-    float tileWidth  = static_cast<float>(areaWidth) / cols;
-    float tileHeight = static_cast<float>(gridHeight) / rows;
-
-    for (int y = 0; y < rows; y++) {
-        for (int x = 0; x < cols; x++) {
-            Tile t;
-            t.rect = { offsetX + x * tileWidth, offsetY + y * tileHeight,
-                    tileWidth, tileHeight };
-
-            int index = y * cols + x;
-            if (index < static_cast<int>(oldAnimals.size())) {
-                t.animal = std::move(oldAnimals[index]);
-            }
-
-            tiles.push_back(std::move(t));
-        }
-    }
-
-}
 
 
-// Expand grid keeping existing animals
-void ExpandGrid(std::vector<Tile>& tiles, int oldCols, int oldRows,
-                int newCols, int newRows,
-                int areaWidth, int gridHeight, int offsetX, int offsetY)
-{
-    float tileWidth  = static_cast<float>(areaWidth) / newCols;
-    float tileHeight = static_cast<float>(gridHeight) / newRows;
 
-    std::vector<Tile> newTiles;
-    newTiles.reserve(newCols * newRows);
-
-    for (int y = 0; y < newRows; y++) {
-        for (int x = 0; x < newCols; x++) {
-            Tile t;
-            t.rect = { offsetX + x * tileWidth, offsetY + y * tileHeight,
-                    tileWidth, tileHeight };
-
-            if (x < oldCols && y < oldRows) {
-                t.animal = std::move(tiles[y * oldCols + x].animal);
-            }
-            newTiles.push_back(std::move(t));
-        }
-    }
-    tiles = std::move(newTiles);
-}
 
 // ----------------------
 // Main
@@ -140,10 +74,6 @@ int main() {
     SelectedCrop selectedCrop = SelectedCrop::BERRY;
 
 
-    // crops
-    enum class SelectedCrop { BERRY, POTATO, PUMPKIN };
-    SelectedCrop selectedCrop = SelectedCrop::BERRY;
-
 
     FarmTextures tex = LoadFarmTextures();
 
@@ -153,13 +83,16 @@ int main() {
     Texture2D hoedTex = LoadTexture("assets/hoedPixel.png");
 
     Texture2D coinTex = LoadTexture("assets/coinPixel.png");
-    Texture2D hoeTex = LoadTexture("assets/hoePixel.png");
-    Texture2D shopTex = LoadTexture("assets/shopPixel.png");
+   // Texture2D hoeTex = LoadTexture("assets/hoePixel.png");
+    // Texture2D shopTex = LoadTexture("assets/shopPixel.png");
 
     Texture2D cowTex = LoadTexture("assets/cowPixel.png");
     Texture2D sheepTex = LoadTexture("assets/sheepPixel.png");
     Texture2D chickenTex = LoadTexture("assets/chickenPixel.png");
-    Texture2D pigTex = LoadTexture("assets/pigPixel.png");
+    Texture2D pigTex = LoadTexture("assets/pigPixel.png")
+    
+    
+    ;
 
     std::vector<Tile> tiles;
     int prevCols = gridCols, prevRows = gridRows;
@@ -171,6 +104,8 @@ int main() {
     int coins = 150;
     int currentDay = 1;
 
+
+    
     while (!WindowShouldClose()) {
         // calculates time to be used in animals and crops
         // GetFrameTime gives total time since window was initialised.
@@ -222,9 +157,9 @@ int main() {
 
         if (gridCols != prevCols || gridRows != prevRows || tiles.empty()) {
             if (!tiles.empty()) {
-                ExpandGrid(tiles, prevCols, prevRows, gridCols, gridRows, areaWidth, areaHeight, offsetX, offsetY);
+                ExpandGrid(tiles, prevCols, prevRows, gridCols, gridRows, areaWidth, gridHeight, offsetX, offsetY);
             } else {
-                RebuildGrid(tiles, gridCols, gridRows, areaWidth, areaHeight, offsetX, offsetY);
+                RebuildGrid(tiles, gridCols, gridRows, areaWidth, gridHeight, offsetX, offsetY);
             }
             prevCols = gridCols; prevRows = gridRows;
         } else {

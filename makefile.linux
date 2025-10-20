@@ -12,25 +12,25 @@ endif
 
 # === all source files ===
 SRCS := betterfarm.cpp \
+        grid.cpp \
+        shop.cpp ui.cpp \
         animal.cpp pig.cpp sheep.cpp cow.cpp chicken.cpp \
         menu.cpp options.cpp \
         Crop.cpp Regenerating.cpp Stalk.cpp Large.cpp \
         Berry.cpp Potato.cpp Pumpkin.cpp
 
-# === automatically create matching .o list ===
+# === auto-generate .o names ===
 OBJS := $(SRCS:.cpp=.o)
 
-# default build
+.PHONY: all clean
+
 all: farm
 
-# link step
 farm: $(OBJS)
 	$(CXX) $(CXXFLAGS) $(RAYLIB_CFLAGS) $(OBJS) -o farm $(RAYLIB_LIBS)
 
-# compile step
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) $(RAYLIB_CFLAGS) -c $< -o $@
 
-# clean
 clean:
 	rm -f farm $(OBJS)
