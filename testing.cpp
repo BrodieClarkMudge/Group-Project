@@ -51,7 +51,7 @@ int main() {
       dayTimer = 0.0f;
     }
 
-    // 🌱 Trigger crop growth
+    //  Trigger crop growth
     if (cropTimer >= growEvery) {
       // crop->Grow();  // integrate this with your real crop object
       cropTimer = 0.0f;
