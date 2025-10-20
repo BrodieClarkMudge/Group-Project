@@ -25,6 +25,9 @@ void ShowMainMenu(MainMenu &menu) {
         
         Vector2 mousePos = GetMousePosition();
 
+        if (menu.soundFX) SetMasterVolume(1.0f);
+        else       SetMasterVolume(0.0f);
+
         // Start dragging when mouse pressed on slider
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && CheckCollisionPointRec(mousePos, sliderRect)) {
             draggingSlider = true;

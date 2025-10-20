@@ -26,6 +26,8 @@ int main() {
     InitWindow(initialWidth, initialHeight, "BetterFarm++ OOP (unique_ptr)");
     SetWindowMinSize(640, 400);
 
+    InitAudioDevice();
+
     SetTargetFPS(60);
 
     bool hoeing = false;
@@ -36,6 +38,9 @@ int main() {
     // ----------------------
     MainMenu menu;
     ShowMainMenu(menu);
+    Options option;
+    
+    menu.soundFX = option.soundFX;
 
     int gridCols = 17, gridRows = 10;
     const int minGrid = 10, maxGrid = 25;
@@ -52,7 +57,7 @@ int main() {
     // UI positions
     // ----------------------
     const int uiMargin = 10;
-    int coins = 150;
+    int coins = 10000;
     int currentDay = 1;
 
     while (!WindowShouldClose()) {
@@ -93,11 +98,9 @@ int main() {
         // ----------------------
         // Grid controls
         // ----------------------
-        if (IsKeyPressed(KEY_UP) && gridRows < maxGrid && gridCols < maxGrid) {
+        if (shop.expandingTrue == true && gridRows < maxGrid && gridCols < maxGrid) {
             gridRows += 2; gridCols += 3;
-        }
-        if (IsKeyPressed(KEY_DOWN) && gridRows > minGrid && gridCols > minGrid) {
-            gridRows -= 2; gridCols -= 3;
+            shop.expandingTrue = false;
         }
 
         if (gridCols != prevCols || gridRows != prevRows || tiles.empty()) {
@@ -121,66 +124,57 @@ int main() {
         }
 
 
-        if (IsKeyPressed(KEY_ONE)) selectedAnimal = Selected::COW;
-        if (IsKeyPressed(KEY_TWO)) selectedAnimal = Selected::SHEEP;
-        if (IsKeyPressed(KEY_THREE)) selectedAnimal = Selected::CHICKEN;
-        if (IsKeyPressed(KEY_FOUR)) selectedAnimal = Selected::PIG;
+        float timeChange = GetFrameTime(); // time since last frame
 
+    for (auto& tile : tiles) {
+        if (tile.animal) {
+            tile.animal->updateSoundTimer(timeChange);
+        }
+        if (tile.animal && IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
+            tile.animal->makeSound();
+        }
+    }
 
-        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-            Vector2 mouse = GetMousePosition();
-            for (auto& tile : tiles) {
-                if (CheckCollisionPointRec(mouse, tile.rect) && hoeing == false) {
-                    if (tile.type == TileType::YARD) {
-                        if (tile.animal) {
-                            tile.animal.reset();
-                        } else {
-                            switch (selectedAnimal) {
-                                case Selected::COW: tile.animal = std::make_unique<Cow>(tex.cowTex); 
-                                    break;
-                                case Selected::SHEEP: tile.animal = std::make_unique<Sheep>(tex.sheepTex); 
-                                    break;
-                                case Selected::CHICKEN: tile.animal = std::make_unique<Chicken>(tex.chickenTex); 
-                                    break;
-                                case Selected::PIG: tile.animal = std::make_unique<Pig>(tex.pigTex); 
-                                    break;
-                            }
-                        }
-                    }
-                }
-            }
+    
+
+        // Inside your main loop, after handling other inputs:
+    // Handle placement mode
+    if (shop.placing && shop.selectedItem != "") {
+        Vector2 mouse = GetMousePosition();
+
+        // Exit placement mode
+        if (IsKeyPressed(KEY_ENTER)) {
+            shop.placing = false;
+            shop.selectedItem = "";
         }
 
-        if (!shop.open && !shop.selectedItem.empty()) {
-            Vector2 mouse = GetMousePosition();
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
             for (auto& tile : tiles) {
                 if (CheckCollisionPointRec(mouse, tile.rect)) {
-                    if (shop.selectedItem == "YARD" && tile.type == TileType::GRASS && coins >= 20) {
-                        tile.type = TileType::HOED;
+                    if (shop.selectedItem == "YARD" && coins >= 20 & tile.type != TileType::YARD) {
+                        tile.type = TileType::YARD;
                         coins -= 20;
-                    }
-                    else if (shop.selectedItem == "COW" && tile.type == TileType::YARD && !tile.animal && coins >= 50) {
-                        tile.animal = std::make_unique<Cow>(tex.cowTex);
+                    } else if (shop.selectedItem == "COW" && coins >= 50 && tile.type == TileType::YARD && !tile.animal) {
+                        tile.animal = std::make_unique<Cow>(tex.cowTex,tex.cowSound);
                         coins -= 50;
-                    }
-                    else if (shop.selectedItem == "SHEEP" && tile.type == TileType::YARD && !tile.animal && coins >= 40) {
-                        tile.animal = std::make_unique<Sheep>(tex.sheepTex);
+                    } else if (shop.selectedItem == "SHEEP" && coins >= 40 && tile.type == TileType::YARD && !tile.animal) {
+                        tile.animal = std::make_unique<Sheep>(tex.sheepTex, tex.sheepSound);
                         coins -= 40;
-                    }
-                    else if (shop.selectedItem == "CHICKEN" && tile.type == TileType::YARD && !tile.animal && coins >= 30) {
-                        tile.animal = std::make_unique<Chicken>(tex.chickenTex);
+                    } else if (shop.selectedItem == "CHICKEN" && coins >= 30 && tile.type == TileType::YARD && !tile.animal) {
+                        tile.animal = std::make_unique<Chicken>(tex.chickenTex, tex.chickenSound);
                         coins -= 30;
-                    }
-                    else if (shop.selectedItem == "PIG" && tile.type == TileType::YARD && !tile.animal && coins >= 60) {
-                        tile.animal = std::make_unique<Pig>(tex.pigTex);
+                    } else if (shop.selectedItem == "PIG" && coins >= 60 && tile.type == TileType::YARD && !tile.animal) {
+                        tile.animal = std::make_unique<Pig>(tex.pigTex, tex.pigSound);
                         coins -= 60;
                     }
 
-                    shop.selectedItem.clear(); // item placed, reset selection
-                    break;
+                    break; // place only once per click
                 }
             }
         }
+    }
+
+
 
 
 
@@ -206,7 +200,7 @@ int main() {
             hoe, Vector2{0, 0}, 0.0f, WHITE
         );
 
-        Rectangle shopUI = { topBar.x + 300, topBar.y + 10, 40, 40};
+        Rectangle shopUI = { topBar.x + 230, topBar.y + 10, 40, 40};
         DrawRectangleLinesEx(shopUI, 2, BROWN);
         DrawTexturePro(tex.shopTex, Rectangle{-10,-10, (float)tex.shopTex.width+20, (float)tex.shopTex.height+20},
             shopUI, Vector2{0, 0}, 0.0f, WHITE
@@ -244,16 +238,32 @@ int main() {
             }
         }
 
-
-
-        DrawText("1:Cow  2:Sheep  3:Chicken  4:Pig  LMB:Place/Remove", 20, winHeight - 60, 20, RAYWHITE);
-        DrawText("Arrow Up/Down: Resize Grid", 20, winHeight - 40, 20, RAYWHITE);
-        DrawText("BetterFarm++ OOP (16:10)", 20, winHeight - 20, 20, RAYWHITE);
-
         Vector2 mousePos = GetMousePosition();
 
-        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && CheckCollisionPointRec(mousePos, optionsBackground)) {
-            Options option;
+        for (auto& tile : tiles) {
+            if (tile.animal && CheckCollisionPointRec(mousePos, tile.rect)) {
+                // Get the animal's state string
+                std::string stateText = tile.animal->getState();
+
+                // Determine tooltip position
+                float textWidth = MeasureText(stateText.c_str(), 14);
+                float textHeight = 18;
+                float tooltipX = mousePos.x + 10;
+                float tooltipY = mousePos.y + 10;
+
+                // Optional: prevent tooltip from going off screen
+                if (tooltipX + textWidth > GetScreenWidth()) tooltipX = GetScreenWidth() - textWidth - 10;
+                if (tooltipY + textHeight > GetScreenHeight()) tooltipY = GetScreenHeight() - textHeight - 10;
+
+                // Draw tooltip background
+                DrawRectangle(tooltipX - 4, tooltipY - 4, textWidth + 8, textHeight + 8, Fade(BLACK, 0.8f));
+
+                // Draw text
+                DrawText(stateText.c_str(), tooltipX, tooltipY, 14, WHITE);
+            }
+        }
+
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && CheckCollisionPointRec(mousePos, optionsBackground) && hoeing == false && shop.placing == false) {
             ShowOptions(option);
         }
 
@@ -268,7 +278,7 @@ int main() {
             hoeing = !hoeing;
         }
 
-        if(hoeing == true) {
+        if(hoeing == true && coins >= 5 && shop.placing == false) {
             DrawTexturePro(
                 tex.hoeTex,
                 Rectangle{0, 0, (float)tex.hoeTex.width, (float)tex.hoeTex.height},
@@ -282,6 +292,16 @@ int main() {
             }
         }
 
+        if(shop.placing) {
+            Rectangle placingShop = { topBar.x + 300, topBar.y + 10, 290, 40 };
+            DrawRectangleRec(placingShop, GOLD);
+            DrawRectangleLinesEx(placingShop, 2, BROWN);
+            DrawText("PLACING - to exit ENTER", (int)placingShop.x + 10, (int)placingShop.y + 10, 20, DARKPURPLE);
+            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && CheckCollisionPointRec(mousePos,placingShop)) {
+                shop.placing = false;
+            }
+        }
+
         EndDrawing();
         
     }
@@ -291,6 +311,7 @@ int main() {
     // ----------------------
     UnloadFarmTextures(tex);
 
+    CloseAudioDevice();
     CloseWindow();
     return 0;
 }

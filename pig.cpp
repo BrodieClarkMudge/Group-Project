@@ -1,8 +1,8 @@
 #include "pig.h"
 #include <iostream>
 
-Pig::Pig(Texture2D pigText)
-    : Animal(pigText, "Pig", "Bacon", 150, 80, 100, 5, 5, 100)
+Pig::Pig(Texture2D pigText, Sound pigSound)
+    : Animal(pigText, "Pig", "Bacon", 150, 80, 100, 5, 5, 100, pigSound)
 {};
 
 void Pig::updateDaily() {
@@ -17,4 +17,8 @@ void Pig::updateDaily() {
     if (isAlive() && timeSinceLastProduction >= productionInterval) {
         hasResourceReady = true;
     }
+}
+
+void Pig::makeSound() {
+    PlaySound(soundEffect);
 }

@@ -3,10 +3,12 @@
 void RebuildGrid(std::vector<Tile>& tiles, int cols, int rows,
                  int areaWidth, int gridHeight, int offsetX, int offsetY)
 {
-    std::vector<std::unique_ptr<Animal>> oldAnimals;
-    oldAnimals.reserve(tiles.size());
+    // Save old tile data (type + animal)
+    struct TileData { TileType type; std::unique_ptr<Animal> animal; };
+    std::vector<TileData> oldTiles;
+    oldTiles.reserve(tiles.size());
     for (auto& tile : tiles) {
-        oldAnimals.push_back(std::move(tile.animal));
+        oldTiles.push_back({ tile.type, std::move(tile.animal) });
     }
 
     tiles.clear();
@@ -17,21 +19,21 @@ void RebuildGrid(std::vector<Tile>& tiles, int cols, int rows,
         for (int x = 0; x < cols; x++) {
             Tile t;
             t.rect = { offsetX + x * tileWidth, offsetY + y * tileHeight,
-                    tileWidth, tileHeight };
+                       tileWidth, tileHeight };
 
             int index = y * cols + x;
-            if (index < static_cast<int>(oldAnimals.size())) {
-                t.animal = std::move(oldAnimals[index]);
+            if (index < static_cast<int>(oldTiles.size())) {
+                t.type = oldTiles[index].type;
+                t.animal = std::move(oldTiles[index].animal);
+            } else {
+                t.type = TileType::GRASS; // default
             }
 
             tiles.push_back(std::move(t));
         }
     }
-
 }
 
-
-// Expand grid keeping existing animals
 void ExpandGrid(std::vector<Tile>& tiles, int oldCols, int oldRows,
                 int newCols, int newRows,
                 int areaWidth, int gridHeight, int offsetX, int offsetY)
@@ -46,13 +48,19 @@ void ExpandGrid(std::vector<Tile>& tiles, int oldCols, int oldRows,
         for (int x = 0; x < newCols; x++) {
             Tile t;
             t.rect = { offsetX + x * tileWidth, offsetY + y * tileHeight,
-                    tileWidth, tileHeight };
+                       tileWidth, tileHeight };
 
             if (x < oldCols && y < oldRows) {
-                t.animal = std::move(tiles[y * oldCols + x].animal);
+                Tile& oldTile = tiles[y * oldCols + x];
+                t.type = oldTile.type;
+                t.animal = std::move(oldTile.animal);
+            } else {
+                t.type = TileType::GRASS; // default
             }
+
             newTiles.push_back(std::move(t));
         }
     }
+
     tiles = std::move(newTiles);
 }

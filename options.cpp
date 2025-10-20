@@ -1,4 +1,5 @@
 #include "options.h"
+#include "menu.h"
 #include "raylib.h"
 
 void ShowOptions(Options &options) {
@@ -25,6 +26,9 @@ void ShowOptions(Options &options) {
         
         Vector2 mousePos = GetMousePosition();
 
+        if (options.soundFX) SetMasterVolume(1.0f);
+        else       SetMasterVolume(0.0f);
+
         // Start dragging when mouse pressed on slider
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && CheckCollisionPointRec(mousePos, sliderRect)) {
             options.draggingSlider = true;
@@ -45,7 +49,6 @@ void ShowOptions(Options &options) {
 
         BeginDrawing();
 
-        // Draw options background
         DrawRectangleRec(optionsRect, LIGHTGRAY);
 
         // Draw sound toggle

@@ -8,7 +8,7 @@ Animal::Animal(){
 
 Animal::Animal(Texture2D texture, string type, string resource,
     int mHealth, int mHunger, int mThirst, int consHunger,
-    int consThirst, int prodInt) {
+    int consThirst, int prodInt, Sound soundFX) {
     species = type;
     sprite = texture;
     health = mHealth;
@@ -25,6 +25,7 @@ Animal::Animal(Texture2D texture, string type, string resource,
     timeSinceFed = 0;
     timeSinceLastProduction = 0;
     hasResourceReady = false;
+    soundEffect = soundFX;
 
 }
 
@@ -141,3 +142,20 @@ void Animal::draw(float x, float y, float width, float height) {
 
 
 void Animal::updateDaily() {};
+
+void Animal::makeSound() {
+    PlaySound(soundEffect);
+}
+
+void Animal::updateSoundTimer(float timeChange) {
+        if (soundCooldown > 0) {
+            soundCooldown -= timeChange;
+        } else {
+            // Random chance to play
+            if (GetRandomValue(0, 100) < 20) { // 20% chance
+                makeSound();
+            }
+            // Reset cooldown to random between 3-10 seconds
+            soundCooldown = GetRandomValue(3000, 10000) / 1000.0f;
+        }
+    }
