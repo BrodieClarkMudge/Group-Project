@@ -6,10 +6,25 @@
 #include "pig.h"
 #include "menu.h"
 #include "options.h"
+// Crops
+#include "Crop.h"
+#include "Regenerating.h"
+#include "Stalk.h"
+#include "Large.h"
+#include "Berry.h"
+#include "Potato.h"
+#include "Pumpkin.h"
 
 #include <vector>
 #include <string>
 #include <memory>
+
+// Timing global variables to be used in animals and crops
+float dt = 0.0; // delta time
+float timeScale = 1.0; // 
+
+
+
 
 // ----------------------
 // Tile holds unique_ptr<Animal>
@@ -20,6 +35,8 @@ struct Tile {
     Rectangle rect;
     TileType type = TileType::GRASS;
     std::unique_ptr<Animal> animal = nullptr;
+    std::unique_ptr<Crop> crop = nullptr;
+    float cropTimer = 0.0;   // seconds since last stage growth
 };
 
 // ----------------------
@@ -106,11 +123,18 @@ int main() {
     MainMenu menu;
     ShowMainMenu(menu);
 
+    timeScale = menu.timeScale; // updates global time scale based on the slider within the main menu.
+
     int gridCols = 17, gridRows = 10;
     const int minGrid = 10, maxGrid = 25;
 
     enum class Selected { COW, SHEEP, CHICKEN, PIG };
     Selected selectedAnimal = Selected::COW;
+
+    // crops
+    enum class SelectedCrop { BERRY, POTATO, PUMPKIN };
+    SelectedCrop selectedCrop = SelectedCrop::BERRY;
+
 
     // Load textures
     Texture2D grassTex = LoadTexture("assets/grassPixel.png");
@@ -137,6 +161,10 @@ int main() {
     int currentDay = 1;
 
     while (!WindowShouldClose()) {
+        // calculates time to be used in animals and crops
+        // GetFrameTime gives total time since window was initialised.
+        dt = GetFrameTime() * timeScale; 
+
         // Get current screen size
         int winWidth = GetScreenWidth();
         int winHeight = GetScreenHeight();
@@ -207,7 +235,14 @@ int main() {
         if (IsKeyPressed(KEY_THREE)) selectedAnimal = Selected::CHICKEN;
         if (IsKeyPressed(KEY_FOUR)) selectedAnimal = Selected::PIG;
 
+        // crops
+        if (IsKeyPressed(KEY_FIVE))   selectedCrop = SelectedCrop::BERRY;
+        if (IsKeyPressed(KEY_SIX))    selectedCrop = SelectedCrop::POTATO;
+        if (IsKeyPressed(KEY_SEVEN))  selectedCrop = SelectedCrop::PUMPKIN;
 
+
+
+        // ANIMAL BRANCH
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
             Vector2 mouse = GetMousePosition();
             for (auto& tile : tiles) {
@@ -217,20 +252,63 @@ int main() {
                             tile.animal.reset();
                         } else {
                             switch (selectedAnimal) {
-                                case Selected::COW: tile.animal = std::make_unique<Cow>(cowTex); 
-                                    break;
-                                case Selected::SHEEP: tile.animal = std::make_unique<Sheep>(sheepTex); 
-                                    break;
-                                case Selected::CHICKEN: tile.animal = std::make_unique<Chicken>(chickenTex); 
-                                    break;
-                                case Selected::PIG: tile.animal = std::make_unique<Pig>(pigTex); 
-                                    break;
+                                // make_unique makes a unique smart pointer.
+                                case Selected::COW:     tile.animal = std::make_unique<Cow>(cowTex);     break;
+                                case Selected::SHEEP:   tile.animal = std::make_unique<Sheep>(sheepTex); break;
+                                case Selected::CHICKEN: tile.animal = std::make_unique<Chicken>(chickenTex); break;
+                                case Selected::PIG:     tile.animal = std::make_unique<Pig>(pigTex);     break;
                             }
                         }
                     }
                 }
             }
         }
+
+        // CROP BRANCH
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+            Vector2 mouse = GetMousePosition();
+            // iterate over all tiles
+            for (auto& tile : tiles) {
+                // not in hoe mode, clicked on a hoed tile,
+                if (CheckCollisionPointRec(mouse, tile.rect) && hoeing == false && tile.type == TileType::HOED) {
+                    // is there a crop already
+                    if (tile.crop) {
+                        // Harvest only if mature
+                        if (tile.crop->IsMature()) {
+                            int payout = 0; // NEEDS TO BE UPDATED SOON ---------------------------------------
+                            bool remove = tile.crop->Harvest(payout);
+                            coins += payout;                 // add coins
+                            if (remove) tile.crop.reset();   // crops marked for deletion are removed
+                            tile.cropTimer = 0.0f;           // reset growth timer (so regen crops are reset)
+                        }
+                        // If not mature: do nothing
+
+
+                       // NO CROP SELECTED 
+                    } else {
+                        // Plant selected crop
+                        switch (selectedCrop) {
+                            case SelectedCrop::BERRY: tile.crop = std::make_unique<Berry>(0.0); // maybe remove this param from class?
+                            break;
+                            case SelectedCrop::POTATO: tile.crop = std::make_unique<Potato>(0.0);
+                            break;
+                            case SelectedCrop::PUMPKIN: tile.crop = std::make_unique<Pumpkin>(0.0); 
+                            break;
+                        }
+
+                        // PLACEHOLDERS -------------------------------------------
+                        // Stage textures
+                        tile.crop->SetTexture(SEED,  hoedTex);  // dirt
+                        tile.crop->SetTexture(SEMI1, yardTex);
+                        tile.crop->SetTexture(SEMI2, grassTex);
+                        tile.crop->SetTexture(FULL,  coinTex); 
+
+                        tile.cropTimer = 0.0f; // start growth clock after planting.
+                    }
+                }
+            }
+        }
+
 
 
 
@@ -289,14 +367,32 @@ int main() {
             }
 
             DrawRectangleLinesEx(tile.rect, 1, BLACK);
+
+            // ANIMALS 
             if (tile.animal) {
                 tile.animal->draw(tile.rect.x, tile.rect.y, tile.rect.width, tile.rect.height);
+            }
+
+            // CROPS
+            if (tile.crop) {
+                // every ~2 seconds go to next stage
+                tile.cropTimer += dt;
+                float growEvery = 2.0;
+                if (tile.cropTimer >= growEvery) {
+                    tile.crop->Grow();
+                    tile.cropTimer = 0.0f;
+                }
+        
+                tile.crop->Draw(tile.rect);
+
             }
         }
 
 
 
-        DrawText("1:Cow  2:Sheep  3:Chicken  4:Pig  LMB:Place/Remove", 20, winHeight - 60, 20, RAYWHITE);
+        DrawText("1:Cow  2:Sheep  3:Chicken  4:Pig  LMB:Place/Remove, 5:Berry  6:Potato  7:Pumpkin", 20, winHeight - 60, 20, RAYWHITE);
+        DrawText("", 20, winHeight - 80, 20, RAYWHITE);
+
         DrawText("Arrow Up/Down: Resize Grid", 20, winHeight - 40, 20, RAYWHITE);
         DrawText("BetterFarm++ OOP (16:10)", 20, winHeight - 20, 20, RAYWHITE);
 

@@ -2,7 +2,7 @@
 CXX := g++
 CXXFLAGS := -std=c++17 -O2 -Wall -Wextra
 
-# Try pkg-config first; fallback to manual libs if raylib isn't found
+# detect raylib via pkg-config, fallback if needed
 RAYLIB_CFLAGS := $(shell pkg-config --cflags raylib 2>/dev/null)
 RAYLIB_LIBS   := $(shell pkg-config --libs   raylib 2>/dev/null)
 ifeq ($(strip $(RAYLIB_LIBS)),)
@@ -10,12 +10,27 @@ ifeq ($(strip $(RAYLIB_LIBS)),)
   RAYLIB_LIBS := -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
 endif
 
-FARM_SRCS := betterfarm.cpp animal.cpp pig.cpp sheep.cpp cow.cpp chicken.cpp menu.cpp options.cpp
+# === all source files ===
+SRCS := betterfarm.cpp \
+        animal.cpp pig.cpp sheep.cpp cow.cpp chicken.cpp \
+        menu.cpp options.cpp \
+        Crop.cpp Regenerating.cpp Stalk.cpp Large.cpp \
+        Berry.cpp Potato.cpp Pumpkin.cpp
 
+# === automatically create matching .o list ===
+OBJS := $(SRCS:.cpp=.o)
+
+# default build
 all: farm
 
-farm: $(FARM_SRCS)
-	$(CXX) $(CXXFLAGS) $(RAYLIB_CFLAGS) $(FARM_SRCS) -o farm $(RAYLIB_LIBS)     # ← TAB here
+# link step
+farm: $(OBJS)
+	$(CXX) $(CXXFLAGS) $(RAYLIB_CFLAGS) $(OBJS) -o farm $(RAYLIB_LIBS)
 
+# compile step
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) $(RAYLIB_CFLAGS) -c $< -o $@
+
+# clean
 clean:
-	rm -f farm *.o    # ← TAB here
+	rm -f farm $(OBJS)
