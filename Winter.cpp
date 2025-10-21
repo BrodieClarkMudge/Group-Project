@@ -4,7 +4,6 @@ Winter::Winter() {
   name = "Winter";
   length = 30;
   growthMultiplier = 0.6f;  // Slower crop growth
-  witheringChance = 0.25f;  // Slightly higher
   canRain = false;
   canSnow = true;
   snowstormActive = false;
@@ -21,8 +20,6 @@ int Winter::getLength() const { return length; }
 float Winter::getGrowthMultiplier() const {
   return snowstormActive ? growthMultiplier - 0.2f : growthMultiplier;
 }
-
-float Winter::getWitheringChance() const { return witheringChance; }
 
 bool Winter::canHaveRain() const { return canRain; }
 
