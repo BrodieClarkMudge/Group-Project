@@ -30,17 +30,21 @@ int main() {
 
     SetTargetFPS(60);
 
-    bool hoeing = false;
     Shop shop;
+    UIState ui;
 
     // ----------------------
     // Show main menu
     // ----------------------
-    MainMenu menu;
-    ShowMainMenu(menu);
+    Menu menu;
+    menu.ShowMenu(menu);
     Options option;
     
-    menu.soundFX = option.soundFX;
+    if (menu.getSoundFX()) {
+        option.setSoundFXTrue();
+    } else {
+        option.setSoundFXFalse();
+    }
 
     int gridCols = 17, gridRows = 10;
     const int minGrid = 10, maxGrid = 25;
@@ -98,9 +102,9 @@ int main() {
         // ----------------------
         // Grid controls
         // ----------------------
-        if (shop.expandingTrue == true && gridRows < maxGrid && gridCols < maxGrid) {
+        if (shop.getExpanding() == true && gridRows < maxGrid && gridCols < maxGrid) {
             gridRows += 2; gridCols += 3;
-            shop.expandingTrue = false;
+            shop.setExpandingFalse();
         }
 
         if (gridCols != prevCols || gridRows != prevRows || tiles.empty()) {
@@ -139,31 +143,31 @@ int main() {
 
         // Inside your main loop, after handling other inputs:
     // Handle placement mode
-    if (shop.placing && shop.selectedItem != "") {
+    if (shop.getPlacing() && shop.getSelectedItem() != "") {
         Vector2 mouse = GetMousePosition();
 
         // Exit placement mode
         if (IsKeyPressed(KEY_ENTER)) {
-            shop.placing = false;
-            shop.selectedItem = "";
+            shop.setPlacingFalse();
+            shop.setSelectedItem("");
         }
 
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
             for (auto& tile : tiles) {
                 if (CheckCollisionPointRec(mouse, tile.rect)) {
-                    if (shop.selectedItem == "YARD" && coins >= 20 & tile.type != TileType::YARD) {
+                    if (shop.getSelectedItem() == "YARD" && coins >= 20 & tile.type != TileType::YARD) {
                         tile.type = TileType::YARD;
                         coins -= 20;
-                    } else if (shop.selectedItem == "COW" && coins >= 50 && tile.type == TileType::YARD && !tile.animal) {
+                    } else if (shop.getSelectedItem() == "COW" && coins >= 50 && tile.type == TileType::YARD && !tile.animal) {
                         tile.animal = std::make_unique<Cow>(tex.cowTex,tex.cowSound);
                         coins -= 50;
-                    } else if (shop.selectedItem == "SHEEP" && coins >= 40 && tile.type == TileType::YARD && !tile.animal) {
+                    } else if (shop.getSelectedItem() == "SHEEP" && coins >= 40 && tile.type == TileType::YARD && !tile.animal) {
                         tile.animal = std::make_unique<Sheep>(tex.sheepTex, tex.sheepSound);
                         coins -= 40;
-                    } else if (shop.selectedItem == "CHICKEN" && coins >= 30 && tile.type == TileType::YARD && !tile.animal) {
+                    } else if (shop.getSelectedItem() == "CHICKEN" && coins >= 30 && tile.type == TileType::YARD && !tile.animal) {
                         tile.animal = std::make_unique<Chicken>(tex.chickenTex, tex.chickenSound);
                         coins -= 30;
-                    } else if (shop.selectedItem == "PIG" && coins >= 60 && tile.type == TileType::YARD && !tile.animal) {
+                    } else if (shop.getSelectedItem() == "PIG" && coins >= 60 && tile.type == TileType::YARD && !tile.animal) {
                         tile.animal = std::make_unique<Pig>(tex.pigTex, tex.pigSound);
                         coins -= 60;
                     }
@@ -173,9 +177,6 @@ int main() {
             }
         }
     }
-
-
-
 
 
         BeginDrawing();
@@ -263,22 +264,23 @@ int main() {
             }
         }
 
-        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && CheckCollisionPointRec(mousePos, optionsBackground) && hoeing == false && shop.placing == false) {
-            ShowOptions(option);
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && CheckCollisionPointRec(mousePos, optionsBackground) && 
+        ui.hoeing == false && shop.getOpen() == false && shop.getPlacing() == false) {
+            option.ShowOptions(option);
         }
 
-        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && CheckCollisionPointRec(mousePos, shopUI)) {
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && CheckCollisionPointRec(mousePos, shopUI) && option.getOptionsOpen() == false && ui.hoeing == false) {
             shop.Open();
         }
 
         shop.Update(tiles, coins, tex.yardTex, tex.cowTex, tex.sheepTex, tex.chickenTex, tex.pigTex);
         shop.Draw();
 
-        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && CheckCollisionPointRec(mousePos, hoe)) {
-            hoeing = !hoeing;
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && CheckCollisionPointRec(mousePos, hoe) && option.getOptionsOpen() == false && shop.getPlacing() == false && shop.getOpen() == false) {
+            ui.hoeing = !ui.hoeing;
         }
 
-        if(hoeing == true && coins >= 5 && shop.placing == false) {
+        if(ui.hoeing == true && coins >= 5 && shop.getPlacing() == false) {
             DrawTexturePro(
                 tex.hoeTex,
                 Rectangle{0, 0, (float)tex.hoeTex.width, (float)tex.hoeTex.height},
@@ -292,13 +294,13 @@ int main() {
             }
         }
 
-        if(shop.placing) {
+        if(shop.getPlacing()) {
             Rectangle placingShop = { topBar.x + 300, topBar.y + 10, 290, 40 };
             DrawRectangleRec(placingShop, GOLD);
             DrawRectangleLinesEx(placingShop, 2, BROWN);
             DrawText("PLACING - to exit ENTER", (int)placingShop.x + 10, (int)placingShop.y + 10, 20, DARKPURPLE);
             if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && CheckCollisionPointRec(mousePos,placingShop)) {
-                shop.placing = false;
+                shop.setPlacingFalse();
             }
         }
 

@@ -1,12 +1,29 @@
 #ifndef MENU_H
 #define MENU_H
 
-struct MainMenu {
+class Menu {
+    private:
     bool soundFX = true;
     float timeScale = 1.0f;
     int selectedOption = 0;
-};
 
-void ShowMainMenu(MainMenu &menu);
+    public:
+    void ShowMenu(Menu &menu);
+
+    void setSoundFXTrue();
+
+    void setSoundFXFalse();
+
+    bool getSoundFX();
+
+    void setTimeScale(float time);
+
+    float getTimeScale();
+
+    void setSelectedOption(int opt);
+
+    int getSeletedOption();
+
+};
 
 #endif
