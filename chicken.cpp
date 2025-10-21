@@ -6,7 +6,7 @@ Chicken::Chicken(Texture2D chickenText, Sound chickenSound)
 {};
 void Chicken::updateDaily() {
     hunger += hungerConsumption;
-    thirst += waterConsumption;
+    thirst += thirstConsumption;
     timeSinceFed++;
     timeSinceLastProduction++;
 

@@ -16,7 +16,7 @@ class Animal {
     int maxHealth;
     int maxHunger;
     int maxThirst;
-    int waterConsumption;
+    int thirstConsumption;
     int hungerConsumption;
     bool isAliveState;
     int timeSinceFed;
@@ -28,11 +28,12 @@ class Animal {
     Sound soundEffect;
     float soundCooldown = 0;
 
-    void calculateHealth();
-    void checkSurvival();
+
 
 
     public:
+    void calculateHealth();
+    void checkSurvival();
     Animal();
     Animal(Texture2D texture, string type, string resource,
     int mHealth, int mHunger, int mThirst, int consHunger,
@@ -61,6 +62,8 @@ void draw(float x, float y, float width, float height);
 void setThirst(int);
 virtual void makeSound();
 void updateSoundTimer(float timeChange);
+virtual void updateDaily();
+
 };
 
 #endif //ANIMAL_H

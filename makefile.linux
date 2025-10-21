@@ -16,8 +16,8 @@ SRCS := betterfarm.cpp \
         shop.cpp ui.cpp \
         animal.cpp pig.cpp sheep.cpp cow.cpp chicken.cpp \
         menu.cpp options.cpp \
-        Crop.cpp Regenerating.cpp Stalk.cpp Withering.cpp \
-        Berry.cpp Potato.cpp Pumpkin.cpp
+        Crop.cpp Regenerating.cpp Stalk.cpp Withering.cpp Large.cpp \
+        Berry.cpp Potato.cpp Pumpkin.cpp Tomato.cpp
 
 # === object files ===
 OBJS := $(SRCS:.cpp=.o)

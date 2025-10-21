@@ -7,7 +7,7 @@ Sheep::Sheep(Texture2D sheepText, Sound sheepSound)
 
 void Sheep::updateDaily() {
     hunger += hungerConsumption;
-    thirst += waterConsumption;
+    thirst += thirstConsumption;
     timeSinceFed++;
     timeSinceLastProduction++;
 

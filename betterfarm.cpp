@@ -24,7 +24,8 @@
 
 // Timing global variables to be used in animals and crops
 float dt = 0.0; // delta time
-float timeScale = 1.0; // 
+float timeScale = 1.0;
+float dehydrateTick = 0.0f;
 
 
 
@@ -72,6 +73,10 @@ int main() {
         option.setSoundFXFalse();
     }
 
+    if (menu.getSoundFX())
+    SetMasterVolume(1.0f);
+else
+    SetMasterVolume(0.0f);
     int gridCols = 17, gridRows = 10;
     const int minGrid = 10, maxGrid = 25;
 
@@ -94,11 +99,9 @@ int offsetY = (winHeight - areaHeight) / 2 + barHeight;
     // Load textures FIRST (before menu)
     FarmTextures tex = LoadFarmTextures();
 
-    // Show menu
-    MainMenu menu;
-    ShowMainMenu(menu);
 
-    timeScale = menu.timeScale;
+
+    timeScale = menu.getTimeScale();
 
     // Declare tiles and selections
     std::vector<Tile> tiles;
@@ -163,6 +166,35 @@ int offsetY = (winHeight - areaHeight) / 2 + barHeight;
         // calculates time to be used in animals and crops
         // GetFrameTime gives total time since window was initialised.
         dt = GetFrameTime() * timeScale; 
+
+
+        // ---- Thirst drain over time ----
+        static float thirstTick = 0.0f; // static so it tracks between frames
+        thirstTick += dt;
+        if (thirstTick >= 0.7f) { // every 0.7 sec
+            for (auto& tile : tiles) {
+                if (tile.animal) {
+                    int t = tile.animal->getThirst() - 2; // consume water
+                    if (t < 0) t = 0;
+                    tile.animal->setThirst(t);
+                }
+            }
+            thirstTick = 0.0f;
+        }
+        // Apply health damage to dehydrated animals once per second
+        dehydrateTick += dt;
+        if (dehydrateTick >= 0.7f) {
+            for (auto& tile : tiles) {
+                if (tile.animal && tile.animal->getThirst() == 0) {
+                    tile.animal->calculateHealth();
+                    tile.animal->checkSurvival();
+                    if (!tile.animal->isAlive()) {
+                        tile.animal.reset();   // delete
+                    }
+                }
+            }
+            dehydrateTick = 0.0f;
+        }
 
         // Get current screen size
         int winWidth = GetScreenWidth();
@@ -243,17 +275,22 @@ int offsetY = (winHeight - areaHeight) / 2 + barHeight;
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
             Vector2 mouse = GetMousePosition();
             for (auto& tile : tiles) {
-                if (CheckCollisionPointRec(mouse, tile.rect) && hoeing == false && watering == false)  {
+                if (CheckCollisionPointRec(mouse, tile.rect) && ui.hoeing == false && watering == false) {
                     if (tile.type == TileType::YARD) {
                         if (tile.animal) {
                             tile.animal.reset();
                         } else {
                             switch (selectedAnimal) {
                                 // make_unique makes a unique smart pointer.
-                                case Selected::COW:     tile.animal = std::make_unique<Cow>(cowTex);     break;
-                                case Selected::SHEEP:   tile.animal = std::make_unique<Sheep>(sheepTex); break;
-                                case Selected::CHICKEN: tile.animal = std::make_unique<Chicken>(chickenTex); break;
-                                case Selected::PIG:     tile.animal = std::make_unique<Pig>(pigTex);     break;
+                                case Selected::COW:tile.animal = std::make_unique<Cow>(tex.cowTex, tex.cowSound);         
+                                break;
+                                case Selected::SHEEP:tile.animal = std::make_unique<Sheep>(tex.sheepTex, tex.sheepSound);   
+                                break;
+                                case Selected::CHICKEN:tile.animal = std::make_unique<Chicken>(tex.chickenTex, tex.chickenSound); 
+                                break;
+                                case Selected::PIG:tile.animal = std::make_unique<Pig>(tex.pigTex, tex.pigSound);
+                                break;
+
                             }
                         }
                     }
@@ -267,7 +304,7 @@ int offsetY = (winHeight - areaHeight) / 2 + barHeight;
             // iterate over all tiles
             for (auto& tile : tiles) {
                 // not in hoe mode, clicked on a hoed tile,
-                if (CheckCollisionPointRec(mouse, tile.rect) && hoeing == false && watering == false && tile.type == TileType::HOED) {
+                if (CheckCollisionPointRec(mouse, tile.rect) && ui.hoeing == false && watering == false && tile.type == TileType::HOED) {
                     // is there a crop already
                     if (tile.crop) {
                         // Harvest only if mature
@@ -360,11 +397,11 @@ int offsetY = (winHeight - areaHeight) / 2 + barHeight;
 
 
         // Shop
-        if (!shop.open && !shop.selectedItem.empty()) {
+        if (!shop.getOpen() && !shop.getSelectedItem().empty()) {
             Vector2 mouse = GetMousePosition();
             for (auto& tile : tiles) {
                 if (CheckCollisionPointRec(mouse, tile.rect)) {
-                    if (shop.getSelectedItem() == "YARD" && coins >= 20 & tile.type != TileType::YARD) {
+                    if (shop.getSelectedItem() == "YARD" && coins >= 20 && tile.type != TileType::YARD) {
                         tile.type = TileType::YARD;
                         coins -= 20;
                     } else if (shop.getSelectedItem() == "COW" && coins >= 50 && tile.type == TileType::YARD && !tile.animal) {
@@ -507,6 +544,7 @@ int offsetY = (winHeight - areaHeight) / 2 + barHeight;
 
             // ANIMALS 
             if (tile.animal) {
+                tile.animal->updateSoundTimer(dt * 1000); // ms to sec
                 tile.animal->draw(tile.rect.x, tile.rect.y, tile.rect.width, tile.rect.height);
             }
 
@@ -531,6 +569,12 @@ int offsetY = (winHeight - areaHeight) / 2 + barHeight;
                 }
                 tile.crop->Draw(tile.rect);
 
+            }
+        }
+        // kill animals
+        for (auto& tile : tiles) {
+            if (tile.animal && !tile.animal->isAlive()) {
+                tile.animal.reset();
             }
         }
 
@@ -581,6 +625,7 @@ int offsetY = (winHeight - areaHeight) / 2 + barHeight;
 
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && CheckCollisionPointRec(mousePos, hoe) && option.getOptionsOpen() == false && shop.getPlacing() == false && shop.getOpen() == false) {
             ui.hoeing = !ui.hoeing;
+            if (ui.hoeing) watering = false; // keep modes exclusive
         }
 
 
@@ -588,12 +633,11 @@ int offsetY = (winHeight - areaHeight) / 2 + barHeight;
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && CheckCollisionPointRec(mousePos, waterBtn)) {
             watering = !watering;   // flip on/off
             if (watering) {
-                hoeing = false; // keep modes exclusive from eachover
+                ui.hoeing = false; // keep modes exclusive
             }
         }
 
         // hoe to follow cursour 
-        if(hoeing == true) {
         if(ui.hoeing == true && coins >= 5 && shop.getPlacing() == false) {
             DrawTexturePro(
                 tex.hoeTex,
@@ -604,7 +648,7 @@ int offsetY = (winHeight - areaHeight) / 2 + barHeight;
 
     
         for (auto &tile : tiles) {
-            if (hoeing && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && tile.type == TileType::GRASS
+            if (ui.hoeing && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && tile.type == TileType::GRASS
                 && CheckCollisionPointRec(mousePos, tile.rect)) {
                      tile.type = TileType::HOED;
                      coins = coins - 5;
@@ -620,7 +664,7 @@ int offsetY = (winHeight - areaHeight) / 2 + barHeight;
                     {80/2.0f, 80/2.0f},
                     0.0, WHITE);
             }
-        }
+        
 
         if(shop.getPlacing()) {
             Rectangle placingShop = { topBar.x + 300, topBar.y + 10, 290, 40 };

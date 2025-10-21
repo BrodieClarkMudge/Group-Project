@@ -16,7 +16,7 @@ oldTiles.reserve(tiles.size());
 for (auto& tile : tiles) {
     oldTiles.push_back({ tile.type, std::move(tile.animal), std::move(tile.crop), tile.cropTimer, tile.waterCharges });
 }
-    }
+    
 
     tiles.clear();
 

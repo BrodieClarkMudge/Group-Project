@@ -7,7 +7,7 @@ Pig::Pig(Texture2D pigText, Sound pigSound)
 
 void Pig::updateDaily() {
     hunger += hungerConsumption;
-    thirst += waterConsumption;
+    thirst += thirstConsumption;
     timeSinceFed++;
     timeSinceLastProduction++;
 

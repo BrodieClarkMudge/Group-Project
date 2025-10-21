@@ -7,7 +7,7 @@ Cow::Cow(Texture2D cowText, Sound cowSound)
 
 void Cow::updateDaily() {
     hunger += hungerConsumption;
-    thirst += waterConsumption;
+    thirst += thirstConsumption;
     timeSinceFed++;
     timeSinceLastProduction++;
 

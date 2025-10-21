@@ -1,5 +1,5 @@
 #include "animal.h"
-#include "sstream"
+#include <sstream>
 #include <iostream>
 
 Animal::Animal(){
@@ -16,12 +16,12 @@ Animal::Animal(Texture2D texture, string type, string resource,
     hungerConsumption = consHunger;
     thirstConsumption = consThirst;
     hunger = 0;
-    thirst = 0;
+    thirst = 100;
     maxThirst = 100;
     maxHealth = mHealth;
     maxHunger = mHunger;
     maxThirst = mThirst;
-    waterConsumption = 10;
+    thirstConsumption = 10;
     isAliveState = true;
     producesResource = resource;
     productionInterval = prodInt;
@@ -34,17 +34,18 @@ Animal::Animal(Texture2D texture, string type, string resource,
 
     Animal::~Animal() = default;
 
-void Animal::calculateHealth(){
-    if (hunger == 0){
-        health = health - 5;
-    }
-    if (thirst == 0){
-        health = health - 5;
-    }
-    if (health > 0){
-        health = 0;
-    }
-};
+    void Animal::calculateHealth(){
+        // Drain health only when out of water
+        if (thirst == 0){
+            health -= 5;
+        }
+        // so no negative
+        if (health < 0){
+            health = 0;
+        }
+    };
+    
+
 
 void Animal::checkSurvival(){
     if (health <= 0){
@@ -136,7 +137,11 @@ void Animal::draw(float x, float y, float width, float height) {
 }
 
 
-void Animal::updateDaily() {};
+void Animal::updateDaily() {
+    thirst -= thirstConsumption;
+    if (thirst < 0) {thirst = 0;}
+    
+};
 
 void Animal::makeSound() {
     PlaySound(soundEffect);
@@ -157,7 +162,6 @@ void Animal::updateSoundTimer(float timeChange) {
 
     void Animal::drink() {
         thirst = maxThirst;
-        thirst = 100;
     }
     
     int Animal::getThirst() {
@@ -165,7 +169,7 @@ void Animal::updateSoundTimer(float timeChange) {
     }
     
     void Animal::setThirst(int x) {
-        if (thirst != 0) {
-        thirst = x;
+        if (x >= 0) {
+            thirst = x;
         }
     }
