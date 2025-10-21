@@ -6,7 +6,7 @@ Shop::Shop() {
     open = false;
     buttonWidth = 200;
     buttonHeight = 40;
-    windowRect = { 300, 150, 800, 400 }; // Example window size
+    windowRect = { 300, 150, 620, 400 }; // Example window size
     FarmTextures tex;
 }
 
@@ -85,7 +85,7 @@ void Shop::Update(std::vector<Tile>& tiles, int& coins, int& water,
         coins -= 50;
     }
 
-    Rectangle expand = { windowRect.x + 20, windowRect.y + 300, (float)buttonWidth, (float)buttonHeight };
+    Rectangle expand = { windowRect.x + 300, windowRect.y + 250, (float)buttonWidth, (float)buttonHeight };
     if (CheckCollisionPointRec(mousePos, expand) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
         if (expandedGrid == 0 && coins >= 500) {
             expandingTrue = true;
@@ -114,7 +114,7 @@ void Shop::Draw() {
     DrawRectangleRec(windowRect, RAYWHITE);
     DrawRectangleLinesEx(windowRect, 2, BLACK);
 
-    DrawText("Shop", windowRect.x + 150, windowRect.y + 10, 30, BLACK);
+    DrawText("Shop", windowRect.x + 260, windowRect.y + 10, 30, BLACK);
     DrawText("Buy Yard - 20 coins", windowRect.x + 30, windowRect.y + 60, 20, DARKGREEN);
     DrawText("Buy Cow - 50 coins", windowRect.x + 30, windowRect.y + 110, 20, BROWN);
     DrawText("Buy Sheep - 40 coins", windowRect.x + 30, windowRect.y + 160, 20, GRAY);
@@ -122,16 +122,16 @@ void Shop::Draw() {
     DrawText("Buy Pig - 60 coins", windowRect.x + 30, windowRect.y + 260, 20, MAROON);
     DrawText("Buy Pumpkin Seed - 10 coins", windowRect.x + 310, windowRect.y + 60, 20, ORANGE);
     DrawText("Buy Tomato Seed - 10 coins", windowRect.x + 310, windowRect.y + 110, 20, RED);
-    DrawText("Buy Potato Seed - 10 coins", windowRect.x + 310, windowRect.y + 160, 20, YELLOW);
+    DrawText("Buy Potato Seed - 10 coins", windowRect.x + 310, windowRect.y + 160, 20, DARKBROWN);
     DrawText("Buy 10 Water - 50 coins", windowRect.x + 310, windowRect.y + 210, 20, BLUE);
     if (expandedGrid == 0) {
-        DrawText("Expand farm - 500 coins", windowRect.x + 30, windowRect.y + 310, 20, GOLD);
+        DrawText("Expand farm - 500 coins", windowRect.x + 310, windowRect.y + 260, 20, GOLD);
     } else if (expandedGrid == 1) {
-        DrawText("Expand farm 2 - 2000 coins", windowRect.x + 30, windowRect.y + 310, 20, GOLD);
+        DrawText("Expand farm 2 - 2000 coins", windowRect.x + 310, windowRect.y + 260, 20, GOLD);
     } else if (expandedGrid == 2) {
-        DrawText("Expand farm 3 - 5000 coins", windowRect.x + 30, windowRect.y + 310, 20, GOLD);
+        DrawText("Expand farm 3 - 5000 coins", windowRect.x + 310, windowRect.y + 260, 20, GOLD);
     } else {
-        DrawText("Max farm expansion reached", windowRect.x + 30, windowRect.y + 310, 20, GOLD);
+        DrawText("Max farm expansion reached", windowRect.x + 310, windowRect.y + 260, 20, GOLD);
     }
-    DrawText("Press ENTER to exit",windowRect.x + 60, windowRect.y + 360, 20, BLACK);
+    DrawText("Press ENTER to exit",windowRect.x + 200, windowRect.y + 360, 20, BLACK);
 }
