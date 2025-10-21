@@ -1,8 +1,8 @@
 
 #include "WeatherSystem.h"
 
-#include <cstdlib>  // for rand()
-#include <ctime>    // for time()
+#include <cstdlib> // for rand()
+#include <ctime> // for time()
 
 #include "Autumn.h"
 #include "Spring.h"
@@ -12,8 +12,8 @@
 using namespace std;
 
 WeatherSystem::WeatherSystem() {
-  srand(time(NULL));                      // Seed random generator
-  currentSeason = make_unique<Summer>();  // Start in Summer
+  srand(time(NULL)); // Seed random generator
+  currentSeason = make_unique<Summer>(); // Start in Summer
   currentDayInSeason = 0;
   generateWeather();
 }
@@ -41,7 +41,7 @@ void WeatherSystem::generateWeather() {
     }
   }
 
-  currentWeather = "Clear";  // Fallback
+  currentWeather = "Clear"; // default
 }
 
 string WeatherSystem::getCurrentWeather() const { return currentWeather; }
@@ -50,8 +50,8 @@ Season* WeatherSystem::getCurrentSeason() const { return currentSeason.get(); }
 
 bool WeatherSystem::isRaining() const { return currentWeather == "Rain"; }
 
-// Moves to the next season in a looped cycle: Summer -> Autumn -> Winter ->
-// Spring -> Summer
+// Moves to the next season in loop
+
 void WeatherSystem::changeSeason() {
   string current = currentSeason->getName();
   if (current == "Summer")

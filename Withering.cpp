@@ -1,7 +1,7 @@
 #include "Withering.h"
 
 Withering::Withering(float dt) : Crop(dt) {
-  timeBeforeDeath = 0.0f;  // default: never die after ripe unless changed
+  timeBeforeDeath = 0.0f;  // default, never die after ripe unless changed
   ripeTimer = 0.0f;
 }
 

@@ -5,8 +5,8 @@
 
 class Withering : public Crop {
  protected:
-  float timeBeforeDeath;  // time after FULL before it dies
-  float ripeTimer;        // tracks how long it's been FULL
+  float timeBeforeDeath; // time after FULL before it dies
+  float ripeTimer; // tracks how long it's been FULL
 
  public:
   Withering(float dt);

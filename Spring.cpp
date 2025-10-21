@@ -3,14 +3,14 @@
 Spring::Spring() {
   name = "Spring";
   length = 30;
-  growthMultiplier = 1.3f;  // Already faster
+  growthMultiplier = 1.3f; 
   canRain = true;
   canSnow = false;
   bloomEventActive = false;
 
   weatherProbabilities = {
       {"Clear", 0.5f}, {"Rain", 0.4f}, {"Bloom", 0.1f}
-      // Special spring weather!
+
   };
 }
 

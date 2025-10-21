@@ -62,4 +62,4 @@ class Animal {
   virtual void updateDaily();
 };
 
-#endif  // ANIMAL_H
+#endif  

@@ -3,13 +3,13 @@
 Winter::Winter() {
   name = "Winter";
   length = 30;
-  growthMultiplier = 1.0f;  // Slower crop growth
+  growthMultiplier = 1.0f; // Slower crop growth
   canRain = false;
   canSnow = true;
   snowstormActive = false;
 
   weatherProbabilities = {
-      {"Clear", 0.5f}, {"Snow", 0.4f}, {"Snowstorm", 0.1f}  // Winter-only event
+      {"Clear", 0.5f}, {"Snow", 0.4f}, {"Snowstorm", 0.1f} // Winter-only event
   };
 }
 

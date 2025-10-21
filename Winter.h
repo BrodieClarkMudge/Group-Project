@@ -16,7 +16,7 @@ class Winter : public Season {
   bool canHaveRain() const override;
   std::map<std::string, float> getWeatherProbability() const override;
 
-  // Winter-specific methods
+  // Winter only methods
   void triggerSnowstorm();
   bool isSnowstormActive() const;
 };

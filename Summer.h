@@ -16,8 +16,8 @@ class Summer : public Season {
   bool canHaveRain() const override;
   std::map<std::string, float> getWeatherProbability() const override;
 
-  // Unique Summer-only logic
-  void triggerHeatwave();  // changes internal state
+  //  Summer only 
+  void triggerHeatwave(); 
   bool isHeatwaveActive() const;
 };
 

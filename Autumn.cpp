@@ -2,8 +2,8 @@
 
 Autumn::Autumn() {
   name = "Autumn";
-  length = 28;              // Slightly shorter season
-  growthMultiplier = 1.0f;  // Normal growth
+  length = 28;
+  growthMultiplier = 1.0f; // Normal growth
   canRain = true;
   canSnow = false;
   heavyRainActive = false;
@@ -13,7 +13,7 @@ Autumn::Autumn() {
 
 void Autumn::triggerHeavyRain() {
   heavyRainActive = true;
-  weatherProbabilities["Rain"] = 0.7f;  // More likely to rain
+  weatherProbabilities["Rain"] = 0.7f;
   weatherProbabilities["Clear"] = 0.2f;
   weatherProbabilities["Fog"] = 0.1f;
 }

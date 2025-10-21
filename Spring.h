@@ -16,7 +16,7 @@ class Spring : public Season {
   bool canHaveRain() const override;
   std::map<std::string, float> getWeatherProbability() const override;
 
-  // Spring-specific method
+  // Spring only method
   void triggerBloom();  // enables bloom event
   bool isBloomActive() const;
 };
