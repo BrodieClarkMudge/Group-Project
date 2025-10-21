@@ -54,24 +54,19 @@ int main() {
     int currentDay = 1;
 
     while (!WindowShouldClose()) {
-        // Get current screen size
-        int winWidth = GetScreenWidth();
-        int winHeight = GetScreenHeight();
 
         // Prevent too small
-        if (winWidth < 800 || winHeight < 500) {
-            SetWindowSize((winWidth < 800) ? 800 : winWidth,
-                          (winHeight < 500) ? 500 : winHeight);
-            winWidth = GetScreenWidth();
-            winHeight = GetScreenHeight();
+        if (GetScreenWidth() < 800 || GetScreenHeight() < 500) {
+            SetWindowSize((GetScreenWidth() < 800) ? 800 : GetScreenWidth(),
+                          (GetScreenHeight() < 500) ? 500 : GetScreenHeight());
         }
 
-        int availableWidth  = winWidth;
-        int availableHeight = winHeight;
+        int availableWidth  = GetScreenWidth();
+        int availableHeight = GetScreenHeight();
 
         // First try: fit width
         int areaWidth = availableWidth;
-        int areaHeight = (int)(areaWidth / aspectRatio);
+        int areaHeight = (int)(GetScreenWidth() / aspectRatio);
 
         // If too tall for window, fit by height instead
         if (areaHeight > availableHeight) {
@@ -83,8 +78,8 @@ int main() {
         int gridHeight = areaHeight - barHeight;
 
         // Offsets to center horizontally + vertically
-        int offsetX = (winWidth - areaWidth) / 2;
-        int offsetY = (winHeight - areaHeight) / 2 + barHeight; // grid starts below bar
+        int offsetX = (GetScreenWidth() - areaWidth) / 2;
+        int offsetY = (GetScreenHeight() - areaHeight) / 2 + barHeight; // grid starts below bar
 
 
 
