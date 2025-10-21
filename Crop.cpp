@@ -4,6 +4,7 @@
 #include <string>
 #include <memory>
 #include "raylib-cpp.hpp"
+#include "raylib.h"
 #include "Crop.h"
 #include "menu.h"
 

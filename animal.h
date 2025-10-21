@@ -2,7 +2,7 @@
 #define ANIMAL_H
 
 #include <string>
-#include <raylib.h>
+#include "raylib.h"
 
 using namespace std;
 
