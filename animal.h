@@ -6,8 +6,9 @@
 
 using namespace std;
 
-class Animal {
-    protected:
+class Animal
+{
+protected:
     string species;
     Texture2D sprite;
     int health;
@@ -29,13 +30,13 @@ class Animal {
     float soundCooldown = 0;
     bool isPlaying = false;
 
-    public:
+public:
     void calculateHealth();
     void checkSurvival();
     Animal();
     Animal(Texture2D texture, string type, string resource,
-    int mHealth, int mHunger, int mThirst, int consHunger,
-    int consThirst, int prodInt, Sound soundFX);
+           int mHealth, int mHunger, int mThirst, int consHunger,
+           int consThirst, int prodInt, Sound soundFX);
 
     virtual ~Animal();
 
@@ -51,17 +52,17 @@ class Animal {
     string getSpecies();
     string getResourceType();
 
-
     void collectResource();
     bool hasResourceAvailable();
 
-void setTexture(Texture2D sprite);
-void draw(float x, float y, float width, float height);
-void setThirst(int);
-virtual void makeSound();
-void updateSoundTimer(float timeChange);
-virtual void updateDaily();
+    void setTexture(Texture2D sprite);
+    void draw(float x, float y, float width, float height);
+    void setThirst(int);
+    virtual void makeSound();
+    void updateSoundTimer(float timeChange);
+    virtual void updateDaily(float changeTime);
 
+    virtual int sellProduct() = 0;
 };
 
-#endif //ANIMAL_H
+#endif

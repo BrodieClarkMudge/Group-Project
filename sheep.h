@@ -10,8 +10,9 @@ class Sheep : public Animal {
 
     public:
     Sheep(Texture2D sheepText, Sound sheepSound);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
-    void updateDaily() override;
+    void updateDaily(float changeTime) override;
     void makeSound() override;
+    int sellProduct() override;
 };
 
 #endif

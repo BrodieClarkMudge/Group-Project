@@ -1,9 +1,10 @@
 #include "Autumn.h"
 
-Autumn::Autumn() {
+Autumn::Autumn()
+{
   name = "Autumn";
-  length = 28;              // Slightly shorter season
-  growthMultiplier = 1.0f;  // Normal growth
+  length = 28;             // Slightly shorter season
+  growthMultiplier = 1.0f; // Normal growth
   canRain = true;
   canSnow = false;
   heavyRainActive = false;
@@ -11,9 +12,10 @@ Autumn::Autumn() {
   weatherProbabilities = {{"Clear", 0.5f}, {"Rain", 0.4f}, {"Fog", 0.1f}};
 }
 
-void Autumn::triggerHeavyRain() {
+void Autumn::triggerHeavyRain()
+{
   heavyRainActive = true;
-  weatherProbabilities["Rain"] = 0.7f;  // More likely to rain
+  weatherProbabilities["Rain"] = 0.7f; // More likely to rain
   weatherProbabilities["Clear"] = 0.2f;
   weatherProbabilities["Fog"] = 0.1f;
 }
@@ -28,6 +30,7 @@ float Autumn::getGrowthMultiplier() const { return growthMultiplier; }
 
 bool Autumn::canHaveRain() const { return canRain; }
 
-std::map<std::string, float> Autumn::getWeatherProbability() const {
+std::map<std::string, float> Autumn::getWeatherProbability() const
+{
   return weatherProbabilities;
 }

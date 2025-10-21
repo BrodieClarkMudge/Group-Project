@@ -6,11 +6,12 @@
 
 #include "Season.h"
 
-class Autumn : public Season {
- private:
+class Autumn : public Season
+{
+private:
   bool heavyRainActive;
 
- public:
+public:
   Autumn();
 
   // Autumn-specific method

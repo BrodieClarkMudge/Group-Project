@@ -31,11 +31,9 @@ Animal::Animal(Texture2D texture, string type, string resource,
 Animal::~Animal() = default;
 
 void Animal::calculateHealth(){
-    // Drain health only when out of water
     if (thirst == 0){
         health -= 5;
     }
-    // Prevent negative health
     if (health < 0){
         health = 0;
     }
@@ -51,9 +49,9 @@ string Animal::getState() {
     std::ostringstream oss;
     oss << species
         << ", HP: " << health
-        << ", Hunger: " << hunger
         << ", Thirst: " << thirst
-        << (isAlive() ? ", Alive" : ", Dead");
+        << (isAlive() ? ", Alive" : ", Dead")
+        << ", Time to product: " << productionInterval - timeSinceLastProduction;
     return oss.str();
 }
 
@@ -105,7 +103,6 @@ string Animal::getResourceType(){
     
 void Animal::collectResource(){
     if(hasResourceReady == true) {
-        //********* produced output added to storage*/
         hasResourceReady = false;
         timeSinceLastProduction = 0;
     }
@@ -132,7 +129,7 @@ void Animal::draw(float x, float y, float width, float height) {
     }
 }
 
-void Animal::updateDaily() {
+void Animal::updateDaily(float changeTime) {
     thirst -= thirstConsumption;
     if (thirst < 0) {
         thirst = 0;
@@ -150,9 +147,9 @@ void Animal::updateSoundTimer(float timeChange) {
     }
 
     // Attempt random play
-    if (GetRandomValue(0, 10000) < 5) { // ~0.05% chance per frame
+    if (GetRandomValue(0, 10000) < 5) {
         makeSound();
-        soundCooldown = 2.0f + (GetRandomValue(10000, 30000) / 1000.0f); // 12–32 sec cooldown
+        soundCooldown = 2.0f + (GetRandomValue(10000, 30000) / 1000.0f);
     }
 
     // Reset isPlaying if sound finished
