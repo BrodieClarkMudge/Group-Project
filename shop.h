@@ -13,7 +13,7 @@ private:
     int buttonWidth;
     int buttonHeight;
     bool open = false;
-    bool placing = false;           // true while user chooses where to place
+    bool placing = false;          
     bool expandingTrue = false;
     int expandedGrid = 0;
     std::string selectedItem = "";
