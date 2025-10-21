@@ -1,5 +1,6 @@
 #include "animal.h"
 #include "sstream"
+#include <memory>
 #include <iostream>
 
 Animal::Animal(){

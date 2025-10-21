@@ -32,13 +32,12 @@ int main() {
 
     Shop shop;
     UIState ui;
-
-    // ----------------------
-    // Show main menu
-    // ----------------------
+    FarmTextures tex;
+    Tile tile;
     Menu menu;
-    menu.ShowMenu(menu);
     Options option;
+
+    menu.ShowMenu(menu);
     
     if (menu.getSoundFX()) {
         option.setSoundFXTrue();
@@ -46,21 +45,11 @@ int main() {
         option.setSoundFXFalse();
     }
 
-    int gridCols = 17, gridRows = 10;
-    const int minGrid = 10, maxGrid = 25;
-
-    enum class Selected { COW, SHEEP, CHICKEN, PIG };
-    Selected selectedAnimal = Selected::COW;
-
-    FarmTextures tex = LoadFarmTextures();
-
     std::vector<Tile> tiles;
-    int prevCols = gridCols, prevRows = gridRows;
 
     // ----------------------
     // UI positions
     // ----------------------
-    const int uiMargin = 10;
     int coins = 10000;
     int currentDay = 1;
 
@@ -102,40 +91,39 @@ int main() {
         // ----------------------
         // Grid controls
         // ----------------------
-        if (shop.getExpanding() == true && gridRows < maxGrid && gridCols < maxGrid) {
-            gridRows += 2; gridCols += 3;
+        if (shop.getExpanding() == true && tile.getGridRows() < tile.getMaxGrid() && tile.getGridCols() < tile.getMaxGrid()) {
+            tile.setGridRows(tile.getGridRows() + 2); tile.setGridCols(tile.getGridCols() + 3);
             shop.setExpandingFalse();
         }
 
-        if (gridCols != prevCols || gridRows != prevRows || tiles.empty()) {
+        if (tile.getGridCols() != tile.getPrevCols() || tile.getGridRows() != tile.getPrevRows() || tiles.empty()) {
             if (!tiles.empty()) {
-                ExpandGrid(tiles, prevCols, prevRows, gridCols, gridRows, areaWidth, areaHeight, offsetX, offsetY);
+                tile.ExpandGrid(tiles, tile.getPrevCols(), tile.getPrevRows(), tile.getGridCols(), tile.getGridRows(), areaWidth, areaHeight, offsetX, offsetY);
             } else {
-                RebuildGrid(tiles, gridCols, gridRows, areaWidth, areaHeight, offsetX, offsetY);
+                tile.RebuildGrid(tiles, tile.getGridCols(), tile.getGridRows(), areaWidth, areaHeight, offsetX, offsetY);
             }
-            prevCols = gridCols; prevRows = gridRows;
+            tile.setPrevCols(tile.getGridCols()); tile.setPrevRows(tile.getGridRows());
         } else {
             // Update rect positions on resize
-            float tileWidth  = static_cast<float>(areaWidth) / gridCols;
-            float tileHeight = static_cast<float>(gridHeight) / gridRows;
+            float tileWidth  = static_cast<float>(areaWidth) / tile.getGridCols();
+            float tileHeight = static_cast<float>(gridHeight) / tile.getGridRows();
 
-            for (int y = 0; y < gridRows; y++) {
-                for (int x = 0; x < gridCols; x++) {
-                    int i = y * gridCols + x;
-                    tiles[i].rect = { offsetX + x * tileWidth, offsetY + y * tileHeight, tileWidth, tileHeight };
+            for (int y = 0; y < tile.getGridRows(); y++) {
+                for (int x = 0; x < tile.getGridCols(); x++) {
+                    int i = y * tile.getGridCols() + x;
+                    tiles[i].setRect({ offsetX + x * tileWidth, offsetY + y * tileHeight, tileWidth, tileHeight });
                 }
             }
         }
 
-
-        float timeChange = GetFrameTime(); // time since last frame
+    tile.setTimeChange();
 
     for (auto& tile : tiles) {
-        if (tile.animal) {
-            tile.animal->updateSoundTimer(timeChange);
+        if (tile.hasAnimal()) {
+            tile.getAnimal()->updateSoundTimer(tile.getTimeChange());
         }
-        if (tile.animal && IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
-            tile.animal->makeSound();
+        if (tile.hasAnimal() && IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
+            tile.getAnimal()->makeSound();
         }
     }
 
@@ -154,21 +142,21 @@ int main() {
 
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
             for (auto& tile : tiles) {
-                if (CheckCollisionPointRec(mouse, tile.rect)) {
-                    if (shop.getSelectedItem() == "YARD" && coins >= 20 & tile.type != TileType::YARD) {
-                        tile.type = TileType::YARD;
+                if (CheckCollisionPointRec(mouse, tile.getRect())) {
+                    if (shop.getSelectedItem() == "YARD" && coins >= 20 & tile.getType() != TileType::YARD) {
+                        tile.setType(TileType::YARD);
                         coins -= 20;
-                    } else if (shop.getSelectedItem() == "COW" && coins >= 50 && tile.type == TileType::YARD && !tile.animal) {
-                        tile.animal = std::make_unique<Cow>(tex.cowTex,tex.cowSound);
+                    } else if (shop.getSelectedItem() == "COW" && coins >= 50 && tile.getType() == TileType::YARD && !tile.getAnimal()) {
+                        tile.setAnimal(std::make_unique<Cow>(tex.getCowTex(),tex.getCowSound()));
                         coins -= 50;
-                    } else if (shop.getSelectedItem() == "SHEEP" && coins >= 40 && tile.type == TileType::YARD && !tile.animal) {
-                        tile.animal = std::make_unique<Sheep>(tex.sheepTex, tex.sheepSound);
+                    } else if (shop.getSelectedItem() == "SHEEP" && coins >= 40 && tile.getType() == TileType::YARD && !tile.getAnimal()) {
+                        tile.setAnimal(std::make_unique<Sheep>(tex.getSheepTex(), tex.getSheepSound()));
                         coins -= 40;
-                    } else if (shop.getSelectedItem() == "CHICKEN" && coins >= 30 && tile.type == TileType::YARD && !tile.animal) {
-                        tile.animal = std::make_unique<Chicken>(tex.chickenTex, tex.chickenSound);
+                    } else if (shop.getSelectedItem() == "CHICKEN" && coins >= 30 && tile.getType()== TileType::YARD && !tile.getAnimal()) {
+                        tile.setAnimal(std::make_unique<Chicken>(tex.getChickenTex(), tex.getChickenSound()));
                         coins -= 30;
-                    } else if (shop.getSelectedItem() == "PIG" && coins >= 60 && tile.type == TileType::YARD && !tile.animal) {
-                        tile.animal = std::make_unique<Pig>(tex.pigTex, tex.pigSound);
+                    } else if (shop.getSelectedItem() == "PIG" && coins >= 60 && tile.getType() == TileType::YARD && !tile.getAnimal()) {
+                        tile.setAnimal(std::make_unique<Pig>(tex.getPigTex(), tex.getPigSound()));
                         coins -= 60;
                     }
 
@@ -197,13 +185,13 @@ int main() {
         //hoe rectangle
         Rectangle hoe = { topBar.x + 160, topBar.y + 10, 40, 40};
         DrawRectangleLinesEx(hoe, 2, BROWN);
-        DrawTexturePro(tex.hoeTex, Rectangle{0,0, (float)tex.hoeTex.width, (float)tex.hoeTex.height},
+        DrawTexturePro(tex.getHoeTex(), Rectangle{0,0, (float)tex.getHoeTex().width, (float)tex.getHoeTex().height},
             hoe, Vector2{0, 0}, 0.0f, WHITE
         );
 
         Rectangle shopUI = { topBar.x + 230, topBar.y + 10, 40, 40};
         DrawRectangleLinesEx(shopUI, 2, BROWN);
-        DrawTexturePro(tex.shopTex, Rectangle{-10,-10, (float)tex.shopTex.width+20, (float)tex.shopTex.height+20},
+        DrawTexturePro(tex.getShopTex(), Rectangle{-10,-10, (float)tex.getShopTex().width+20, (float)tex.getShopTex().height+20},
             shopUI, Vector2{0, 0}, 0.0f, WHITE
         );
 
@@ -222,29 +210,29 @@ int main() {
 
 
         for (auto& tile : tiles) {
-            if (tile.type == TileType::GRASS) {
-                DrawTexturePro(tex.grassTex, Rectangle{0, 0, (float)tex.grassTex.width, (float)tex.grassTex.height},
-                tile.rect, Vector2{0, 0}, 0.0f, WHITE);
-            } else if (tile.type == TileType::YARD) {
-                DrawTexturePro(tex.yardTex, Rectangle{0, 0, (float)tex.yardTex.width, (float)tex.yardTex.height},
-                tile.rect, Vector2{0, 0}, 0.0f, WHITE);
-            } else if (tile.type == TileType::HOED) {
-                DrawTexturePro(tex.hoedTex, Rectangle{0, 0, (float)tex.hoedTex.width, (float)tex.hoedTex.height},
-                tile.rect, Vector2{0, 0}, 0.0f, WHITE);
+            if (tile.getType() == TileType::GRASS) {
+                DrawTexturePro(tex.getGrassTex(), Rectangle{0, 0, (float)tex.getGrassTex().width, (float)tex.getGrassTex().height},
+                tile.getRect(), Vector2{0, 0}, 0.0f, WHITE);
+            } else if (tile.getType() == TileType::YARD) {
+                DrawTexturePro(tex.getYardTex(), Rectangle{0, 0, (float)tex.getYardTex().width, (float)tex.getYardTex().height},
+                tile.getRect(), Vector2{0, 0}, 0.0f, WHITE);
+            } else if (tile.getType() == TileType::HOED) {
+                DrawTexturePro(tex.getHoedTex(), Rectangle{0, 0, (float)tex.getHoedTex().width, (float)tex.getHoedTex().height},
+                tile.getRect(), Vector2{0, 0}, 0.0f, WHITE);
             }
 
-            DrawRectangleLinesEx(tile.rect, 1, BLACK);
-            if (tile.animal) {
-                tile.animal->draw(tile.rect.x, tile.rect.y, tile.rect.width, tile.rect.height);
+            DrawRectangleLinesEx(tile.getRect(), 1, BLACK);
+            if (tile.hasAnimal()) {
+                tile.getAnimal()->draw(tile.getRect().x, tile.getRect().y, tile.getRect().width, tile.getRect().height);
             }
         }
 
         Vector2 mousePos = GetMousePosition();
 
         for (auto& tile : tiles) {
-            if (tile.animal && CheckCollisionPointRec(mousePos, tile.rect)) {
+            if (tile.getAnimal() && CheckCollisionPointRec(mousePos, tile.getRect())) {
                 // Get the animal's state string
-                std::string stateText = tile.animal->getState();
+                std::string stateText = tile.getAnimal()->getState();
 
                 // Determine tooltip position
                 float textWidth = MeasureText(stateText.c_str(), 14);
@@ -273,7 +261,7 @@ int main() {
             shop.Open();
         }
 
-        shop.Update(tiles, coins, tex.yardTex, tex.cowTex, tex.sheepTex, tex.chickenTex, tex.pigTex);
+        shop.Update(tiles, coins, tex.getYardTex(), tex.getCowTex(), tex.getSheepTex(), tex.getChickenTex(), tex.getPigTex());
         shop.Draw();
 
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && CheckCollisionPointRec(mousePos, hoe) && option.getOptionsOpen() == false && shop.getPlacing() == false && shop.getOpen() == false) {
@@ -282,13 +270,13 @@ int main() {
 
         if(ui.hoeing == true && coins >= 5 && shop.getPlacing() == false) {
             DrawTexturePro(
-                tex.hoeTex,
-                Rectangle{0, 0, (float)tex.hoeTex.width, (float)tex.hoeTex.height},
+                tex.getHoeTex(),
+                Rectangle{0, 0, (float)tex.getHoeTex().width, (float)tex.getHoeTex().height},
                 Rectangle{mousePos.x, mousePos.y, 80, 80}, Vector2{80 / 2.0f, 80 / 2.0f}, 0.0f, WHITE
             );
             for (auto &tile : tiles) {
-                if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && tile.type == TileType::GRASS && CheckCollisionPointRec(mousePos, tile.rect)) {
-                     tile.type = TileType::HOED;
+                if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && tile.getType() == TileType::GRASS && CheckCollisionPointRec(mousePos, tile.getRect())) {
+                     tile.setType(TileType::HOED);
                      coins = coins - 5;
                 }
             }
@@ -307,11 +295,6 @@ int main() {
         EndDrawing();
         
     }
-
-    // ----------------------
-    // Cleanup
-    // ----------------------
-    UnloadFarmTextures(tex);
 
     CloseAudioDevice();
     CloseWindow();

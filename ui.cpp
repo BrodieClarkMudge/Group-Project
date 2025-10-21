@@ -1,49 +1,101 @@
 #include "ui.h"
 
+FarmTextures::FarmTextures() {
 
-FarmTextures LoadFarmTextures() {
-    FarmTextures tex;
+    grassTex = LoadTexture("assets/grassPixel.png");
+    yardTex = LoadTexture("assets/yardPixel.png");
+    hoedTex = LoadTexture("assets/hoedPixel.png");
 
-    tex.grassTex   = LoadTexture("assets/grassPixel.png");
-    tex.yardTex    = LoadTexture("assets/yardPixel.png");
-    tex.hoedTex    = LoadTexture("assets/hoedPixel.png");
+    coinTex = LoadTexture("assets/coinPixel.png");
+    hoeTex = LoadTexture("assets/hoePixel.png");
+    shopTex = LoadTexture("assets/shopPixel.png");
 
-    tex.coinTex    = LoadTexture("assets/coinPixel.png");
-    tex.hoeTex     = LoadTexture("assets/hoePixel.png");
-    tex.shopTex    = LoadTexture("assets/shopPixel.png");
-
-    tex.cowTex     = LoadTexture("assets/cowPixel.png");
-    tex.sheepTex   = LoadTexture("assets/sheepPixel.png");
-    tex.chickenTex = LoadTexture("assets/chickenPixel.png");
-    tex.pigTex     = LoadTexture("assets/pigPixel.png");
+    cowTex = LoadTexture("assets/cowPixel.png");
+    sheepTex = LoadTexture("assets/sheepPixel.png");
+    chickenTex = LoadTexture("assets/chickenPixel.png");
+    pigTex = LoadTexture("assets/pigPixel.png");
 
 
-    tex.cowSound = LoadSound("assets/cowSound.wav");
-    tex.sheepSound = LoadSound("assets/sheepSound.wav");
-    tex.chickenSound = LoadSound("assets/chickenSound.wav");
-    tex.pigSound = LoadSound("assets/pigSound.wav");
-
-    return tex;
+    cowSound = LoadSound("assets/cowSound.wav");
+    sheepSound = LoadSound("assets/sheepSound.wav");
+    chickenSound = LoadSound("assets/chickenSound.wav");
+    pigSound = LoadSound("assets/pigSound.wav");
 }
 
-void UnloadFarmTextures(FarmTextures& tex) {
-    UnloadTexture(tex.grassTex);
-    UnloadTexture(tex.yardTex);
-    UnloadTexture(tex.hoedTex);
+FarmTextures::~FarmTextures() {
+    UnloadTexture(grassTex);
+    UnloadTexture(yardTex);
+    UnloadTexture(hoedTex);
 
-    UnloadTexture(tex.coinTex);
-    UnloadTexture(tex.hoeTex);
-    UnloadTexture(tex.shopTex);
+    UnloadTexture(coinTex);
+    UnloadTexture(hoeTex);
+    UnloadTexture(shopTex);
 
-    UnloadTexture(tex.cowTex);
-    UnloadTexture(tex.sheepTex);
-    UnloadTexture(tex.chickenTex);
-    UnloadTexture(tex.pigTex);
+    UnloadTexture(cowTex);
+    UnloadTexture(sheepTex);
+    UnloadTexture(chickenTex);
+    UnloadTexture(pigTex);
 
 
-    UnloadSound(tex.cowSound);
-    UnloadSound(tex.sheepSound);
-    UnloadSound(tex.chickenSound);
-    UnloadSound(tex.pigSound);
+    UnloadSound(cowSound);
+    UnloadSound(sheepSound);
+    UnloadSound(chickenSound);
+    UnloadSound(pigSound);
 
+}
+
+Texture2D& FarmTextures::getGrassTex() {
+    return grassTex;
+}
+
+Texture2D& FarmTextures::getYardTex() {
+    return yardTex;
+}
+
+Texture2D& FarmTextures::getHoedTex() {
+    return hoedTex;
+}
+
+Texture2D& FarmTextures::getCoinTex() {
+    return coinTex;
+}
+
+Texture2D& FarmTextures::getHoeTex() {
+    return hoeTex;
+}
+
+Texture2D& FarmTextures::getShopTex() {
+    return shopTex;
+}
+
+Texture2D& FarmTextures::getCowTex() {
+    return cowTex;
+}
+
+Texture2D& FarmTextures::getSheepTex() {
+    return sheepTex;
+}
+
+Texture2D& FarmTextures::getChickenTex() {
+    return chickenTex;
+}
+
+Texture2D& FarmTextures::getPigTex() {
+    return pigTex;
+}
+
+Sound& FarmTextures::getCowSound() {
+    return cowSound;
+}
+
+Sound& FarmTextures::getSheepSound() {
+    return sheepSound;
+}
+
+Sound& FarmTextures::getChickenSound() {
+    return chickenSound;
+}
+
+Sound& FarmTextures::getPigSound() {
+    return pigSound;
 }

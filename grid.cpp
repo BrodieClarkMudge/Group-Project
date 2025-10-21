@@ -1,6 +1,6 @@
 #include "grid.h"
 
-void RebuildGrid(std::vector<Tile>& tiles, int cols, int rows,
+void Tile::RebuildGrid(std::vector<Tile>& tiles, int cols, int rows,
                  int areaWidth, int gridHeight, int offsetX, int offsetY)
 {
     // Save old tile data (type + animal)
@@ -34,7 +34,7 @@ void RebuildGrid(std::vector<Tile>& tiles, int cols, int rows,
     }
 }
 
-void ExpandGrid(std::vector<Tile>& tiles, int oldCols, int oldRows,
+void Tile::ExpandGrid(std::vector<Tile>& tiles, int oldCols, int oldRows,
                 int newCols, int newRows,
                 int areaWidth, int gridHeight, int offsetX, int offsetY)
 {
@@ -63,4 +63,82 @@ void ExpandGrid(std::vector<Tile>& tiles, int oldCols, int oldRows,
     }
 
     tiles = std::move(newTiles);
+}
+
+void Tile::setGridCols(int colGrid) {
+    gridCols = colGrid;
+}
+    
+int Tile::getGridCols() {
+    return gridCols;
+}
+
+void Tile::setGridRows(int rowGrid) {
+    gridRows = rowGrid;
+}
+
+int Tile::getGridRows() {
+    return gridRows;
+}
+
+int Tile::getMinGrid() {
+    return minGrid;
+}
+
+int Tile::getMaxGrid() {
+    return maxGrid;
+}
+
+void Tile::setPrevCols(int colPrev) {
+    prevCols = colPrev;
+}
+
+int Tile::getPrevCols() {
+    return prevCols;
+}
+
+void Tile::setPrevRows(int rowPrev) {
+    prevRows = rowPrev;
+}
+
+int Tile::getPrevRows() {
+    return prevRows;
+}
+
+void Tile::setRect(Rectangle newRect) {
+    rect = newRect;
+}
+
+Rectangle Tile::getRect() {
+    return rect;
+}
+
+void Tile::setAnimal(std::unique_ptr<Animal> newAnimal) {
+    animal = std::move(newAnimal);
+}
+    
+
+Animal* Tile::getAnimal() {
+    return animal.get();
+}
+    
+
+bool Tile::hasAnimal() {
+    return animal != nullptr;
+}
+
+void Tile::setType(TileType newType) {
+    type = newType;
+}
+
+TileType Tile::getType() {
+    return type;
+}
+
+void Tile::setTimeChange() {
+    timeChange = GetFrameTime();
+}
+
+float Tile::getTimeChange() {
+    return timeChange;
 }

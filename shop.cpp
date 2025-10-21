@@ -6,7 +6,7 @@ Shop::Shop() {
     buttonWidth = 200;
     buttonHeight = 40;
     windowRect = { 300, 150, 400, 400 }; // Example window size
-    FarmTextures tex = LoadFarmTextures();
+    FarmTextures tex;
 }
 
 void Shop::Update(std::vector<Tile>& tiles, int& coins,
