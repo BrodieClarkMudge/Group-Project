@@ -4,7 +4,6 @@ Summer::Summer() {
   name = "Summer";
   length = 30;
   growthMultiplier = 1.2f;
-  witheringChance = 0.3f;
   canRain = true;
   canSnow = false;
   isHeatwave = false;
@@ -18,10 +17,6 @@ int Summer::getLength() const { return length; }
 
 float Summer::getGrowthMultiplier() const {
   return isHeatwave ? growthMultiplier * 1.1f : growthMultiplier;
-}
-
-float Summer::getWitheringChance() const {
-  return isHeatwave ? witheringChance + 0.2f : witheringChance;
 }
 
 bool Summer::canHaveRain() const { return canRain; }
