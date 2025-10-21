@@ -90,9 +90,7 @@ int main() {
 
   Texture2D waterCanTex = LoadTexture("assets/waterCanPixel.png");
 
-  // ----------------------
-  // UI positions
-  // ----------------------
+// globals
   // int ui.coins = 100;
   int water = 1000;
   int currentDay = 1;
@@ -178,9 +176,9 @@ int main() {
     int offsetY =
         (winHeight - areaHeight) / 2 + barHeight;  // grid starts below bar
 
-    // ----------------------
+
     // Grid controls
-    // ----------------------
+
     if (shop.getExpanding() == true && tile.getGridRows() < tile.getMaxGrid() &&
         tile.getGridCols() < tile.getMaxGrid()) {
       tile.setGridRows(tile.getGridRows() + 2);
