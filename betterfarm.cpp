@@ -59,14 +59,6 @@ int main()
 
     std::vector<Tile> tiles;
 
-    enum class SelectedCrop
-    {
-        TOMATO,
-        POTATO,
-        PUMPKIN
-    };
-    SelectedCrop selectedCrop = SelectedCrop::TOMATO;
-
     while (!WindowShouldClose())
     {
 
@@ -79,6 +71,15 @@ int main()
         {
             weatherSystem.updateDaily();
             ui.currentDay++;
+
+            for (auto &t : tiles)
+            {
+                if (t.hasAnimal())
+                {
+                    t.getAnimal()->updateDaily(1);
+                }
+            }
+
             ui.dayTimer = 0.0f;
         }
 
@@ -480,10 +481,10 @@ int main()
             {
                 if (CheckCollisionPointRec(mousePos, t.getRect()) && t.hasAnimal())
                 {
-                    Animal* animal = t.getAnimal();
+                    Animal *animal = t.getAnimal();
                     if (animal && animal->hasResourceAvailable())
                     {
-                        ui.coins = animal->sellProduct();
+                        ui.coins += animal->sellProduct();
                         break;
                     }
                 }

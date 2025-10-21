@@ -2,13 +2,11 @@
 #include <iostream>
 
 Pig::Pig(Texture2D pigText, Sound pigSound)
-    : Animal(pigText, "Pig", "Bacon", 150, 80, 100, 5, 5, 100, pigSound)
+    : Animal(pigText, "Pig", "Bacon", 150, 80, 100, 5, 5, 20, pigSound)
 {};
 
 void Pig::updateDaily(float changeTime)
 {
-    hunger += hungerConsumption;
-    thirst += thirstConsumption;
     timeSinceFed += changeTime;
     timeSinceLastProduction+= changeTime;
 

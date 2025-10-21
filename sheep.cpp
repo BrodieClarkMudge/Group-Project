@@ -2,13 +2,11 @@
 #include <iostream>
 
 Sheep::Sheep(Texture2D sheepText, Sound sheepSound)
-    : Animal(sheepText, "Sheep", "Wool", 100, 80, 100, 5, 5, 100, sheepSound)
+    : Animal(sheepText, "Sheep", "Wool", 100, 80, 100, 5, 5, 15, sheepSound)
 {};
 
 void Sheep::updateDaily(float changeTime)
 {
-    hunger += hungerConsumption;
-    thirst += thirstConsumption;
     timeSinceFed += changeTime;
     timeSinceLastProduction+= changeTime;
 

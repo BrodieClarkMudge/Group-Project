@@ -2,12 +2,10 @@
 #include <iostream>
 
 Chicken::Chicken(Texture2D chickenText, Sound chickenSound)
-    : Animal(chickenText, "Chicken", "Eggs", 50, 100, 100, 5, 5, 100, chickenSound) {};
+    : Animal(chickenText, "Chicken", "Eggs", 50, 100, 100, 5, 5, 10, chickenSound) {};
 
     void Chicken::updateDaily(float changeTime)
 {
-    hunger += hungerConsumption;
-    thirst += thirstConsumption;
     timeSinceFed += changeTime;
     timeSinceLastProduction+= changeTime;
 

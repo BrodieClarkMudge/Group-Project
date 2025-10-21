@@ -2,14 +2,13 @@
 #include <iostream>
 
 Cow::Cow(Texture2D cowText, Sound cowSound)
-    : Animal(cowText, "Cow", "Milk", 200, 100, 100, 5, 5, 10, cowSound) {};
+    : Animal(cowText, "Cow", "Milk", 200, 100, 100, 5, 5, 20, cowSound) {};
 
 void Cow::updateDaily(float changeTime)
 {
-    hunger += hungerConsumption;
-    thirst += thirstConsumption;
+
     timeSinceFed += changeTime;
-    timeSinceLastProduction+= changeTime;
+    timeSinceLastProduction += changeTime;
 
     calculateHealth();
     checkSurvival();
@@ -26,7 +25,7 @@ void Cow::makeSound()
 }
 
 int Cow::sellProduct() {
-    if (hasResourceReady) {
+    if (hasResourceReady == true) {
         hasResourceReady = false;
         timeSinceLastProduction = 0.0f;
         return 60;

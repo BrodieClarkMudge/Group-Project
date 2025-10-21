@@ -51,7 +51,7 @@ string Animal::getState() {
         << ", HP: " << health
         << ", Thirst: " << thirst
         << (isAlive() ? ", Alive" : ", Dead")
-        << ", Time to product: " << productionInterval - timeSinceLastProduction;
+        << ", Time to product: " << (productionInterval - timeSinceLastProduction);
     return oss.str();
 }
 
