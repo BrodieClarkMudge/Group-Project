@@ -16,7 +16,7 @@
 #include "Potato.h"
 #include "Pumpkin.h"
 #include "Tomato.h"
-
+#include "Save.h"
 #include <vector>
 #include <string>
 #include <memory>
@@ -190,6 +190,8 @@ int main() {
         if (IsKeyPressed(KEY_FIVE))   selectedCrop = SelectedCrop::TOMATO;
         if (IsKeyPressed(KEY_SIX))    selectedCrop = SelectedCrop::POTATO;
         if (IsKeyPressed(KEY_SEVEN))  selectedCrop = SelectedCrop::PUMPKIN;
+        if (IsKeyPressed(KEY_S)) SaveGame(ui.coins, water);
+        if (IsKeyPressed(KEY_L)) LoadGame(ui.coins, water);
 
         tile.setTimeChange();
 

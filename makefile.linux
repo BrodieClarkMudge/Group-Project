@@ -28,7 +28,8 @@ SRCS := betterfarm.cpp \
         Withering.cpp \
         Potato.cpp \
         Pumpkin.cpp \
-        Tomato.cpp
+        Tomato.cpp \
+        Save.cpp
 
 # === Object files ===
 OBJS := $(SRCS:.cpp=.o)
@@ -39,7 +40,7 @@ OBJS := $(SRCS:.cpp=.o)
 all: farm
 
 farm: $(OBJS)
-	$(CXX) $(CXXFLAGS) $(RAYLIB_CFLAGS) $(OBJS) -o farm $(RAYLIB_LIBS)
+	$(CXX) $(CXXFLAGS) $(OBJS) -o $@ $(RAYLIB_LIBS)
 
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) $(RAYLIB_CFLAGS) -c $< -o $@
