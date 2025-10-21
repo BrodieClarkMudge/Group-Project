@@ -11,5 +11,5 @@ Pumpkin::Pumpkin(float dt)
 Pumpkin::~Pumpkin() = default;
 
 int Pumpkin::GetSellPrice() {
-    return 60; // worth more
+    return 240; // worth more
 }

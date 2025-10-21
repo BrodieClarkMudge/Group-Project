@@ -21,7 +21,7 @@
 #include <string>
 #include <memory>
 #include "WeatherSystem.h"
-
+using namespace std;
 // Timing global variables to be used in animals and crops
 float dt = 0.0f;
 float timeScale = 1.0f;
@@ -97,6 +97,11 @@ int main() {
     int water = 1000;
     int currentDay = 1;
     bool watering = false;
+
+    // temp hard coded
+    int tomatoCost = 50;
+    int potatoCost = 80;
+    int pumpkinCost = 120;
 
     while (!WindowShouldClose()) {
         // Calculates time to be used in animals and crops
@@ -271,19 +276,36 @@ int main() {
                             if (remove) t.removeCrop();
                             t.setCropTimer(0.0f);
                         }
+
+                        // temp hardcoded
+
                     } else {
                         // Plant selected crop
                         switch (selectedCrop) {
-                            case SelectedCrop::TOMATO:
-                                t.setCrop(std::make_unique<Tomato>(0.0));
+                            case SelectedCrop::TOMATO: {
+                                // INPUT VALIDATION - CAN'T BUY IF DON'T HAVE ENOUGH
+                                if (ui.coins >= tomatoCost) {
+                                    ui.coins -= tomatoCost;
+                                    t.setCrop(std::make_unique<Tomato>(0.0));
+                                }
                                 break;
-                            case SelectedCrop::POTATO:
-                                t.setCrop(std::make_unique<Potato>(0.0));
+                            }
+                            case SelectedCrop::POTATO: {
+                                if (ui.coins >= potatoCost) {
+                                    ui.coins -= potatoCost;
+                                    t.setCrop(std::make_unique<Potato>(0.0));
+                                }
                                 break;
-                            case SelectedCrop::PUMPKIN:
-                                t.setCrop(std::make_unique<Pumpkin>(0.0));
+                            }
+                            case SelectedCrop::PUMPKIN: {
+                                if (ui.coins >= pumpkinCost) {
+                                    ui.coins -= pumpkinCost;
+                                    t.setCrop(std::make_unique<Pumpkin>(0.0));
+                                }
                                 break;
+                            }
                         }
+                        
 
                         // Assign crop textures based on type
                         switch (selectedCrop) {
@@ -557,7 +579,7 @@ int main() {
         DrawText(weatherInfo.c_str(), 20, weatherBarY + 8, 18, RAYWHITE);
 
         // Crop instructions on second line
-        DrawText("5:Tomato  6:Potato  7:Pumpkin  LMB:Plant/Harvest", 20,
+        DrawText("5:Tomato(50)  6:Potato(80)  7:Pumpkin(120)  LMB:Plant/Harvest  S:Save  L:Load", 20,
                 weatherBarY + 35, 18, RAYWHITE);
                 Vector2 mousePos = GetMousePosition();
 

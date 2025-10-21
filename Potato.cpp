@@ -8,5 +8,5 @@ Potato::Potato(float dt)
 Potato::~Potato() {}
 
 int Potato::GetSellPrice() {
-    return 35;
+    return 120;
 }
