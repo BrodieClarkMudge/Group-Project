@@ -28,7 +28,8 @@ void DrawUI();
 
 void HandleUIInput();
 
-struct FarmTextures {
+class FarmTextures {
+    private:
     Texture2D grassTex;
     Texture2D yardTex;
     Texture2D hoedTex;
@@ -42,14 +43,45 @@ struct FarmTextures {
     Texture2D chickenTex;
     Texture2D pigTex;
 
+    //sounds
     Sound cowSound;
-    Sound pigSound;
     Sound sheepSound;
     Sound chickenSound;
+    Sound pigSound;
+
+    public:
+    FarmTextures();
+
+    ~FarmTextures();
+
+    Texture2D& getGrassTex();
+
+    Texture2D& getYardTex();
+
+    Texture2D& getHoedTex();
+
+    Texture2D& getCoinTex();
+
+    Texture2D& getHoeTex();
+         
+    Texture2D& getShopTex();
+
+    Texture2D& getCowTex();
+
+    Texture2D& getSheepTex();
+
+    Texture2D& getChickenTex();
+
+    Texture2D& getPigTex();
+
+    Sound& getCowSound();
+
+    Sound& getSheepSound();
+
+    Sound& getChickenSound();
+
+    Sound& getPigSound();
+
 };
-
-FarmTextures LoadFarmTextures();
-
-void UnloadFarmTextures(FarmTextures& tex);
 
 #endif

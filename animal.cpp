@@ -12,16 +12,13 @@ Animal::Animal(Texture2D texture, string type, string resource,
     species = type;
     sprite = texture;
     health = mHealth;
-    thirstConsumption = consThirst;
-    hungerConsumption = consHunger;
-    thirstConsumption = consThirst;
-    hunger = 0;
-    thirst = 100;
-    maxThirst = 100;
     maxHealth = mHealth;
     maxHunger = mHunger;
     maxThirst = mThirst;
-    thirstConsumption = 10;
+    hunger = 0;
+    thirst = 100;
+    hungerConsumption = consHunger;
+    thirstConsumption = consThirst;
     isAliveState = true;
     producesResource = resource;
     productionInterval = prodInt;
@@ -29,29 +26,26 @@ Animal::Animal(Texture2D texture, string type, string resource,
     timeSinceLastProduction = 0;
     hasResourceReady = false;
     soundEffect = soundFX;
-
 }
 
-    Animal::~Animal() = default;
+Animal::~Animal() = default;
 
-    void Animal::calculateHealth(){
-        // Drain health only when out of water
-        if (thirst == 0){
-            health -= 5;
-        }
-        // so no negative
-        if (health < 0){
-            health = 0;
-        }
-    };
-    
-
+void Animal::calculateHealth(){
+    // Drain health only when out of water
+    if (thirst == 0){
+        health -= 5;
+    }
+    // Prevent negative health
+    if (health < 0){
+        health = 0;
+    }
+}
 
 void Animal::checkSurvival(){
     if (health <= 0){
         isAliveState = false;
     }
-};
+}
 
 string Animal::getState() {
     std::ostringstream oss;
@@ -61,9 +55,11 @@ string Animal::getState() {
         << ", Thirst: " << thirst
         << (isAlive() ? ", Alive" : ", Dead");
     return oss.str();
-};
+}
 
-
+void Animal::drink(){
+    thirst = maxThirst;
+}
 
 bool Animal::needsWater(){
     if (thirst >= maxThirst/4) {
@@ -71,17 +67,17 @@ bool Animal::needsWater(){
     }
     else
     return false;
-};
+}
 
 void Animal::eat(){
-        if (hunger > 0) {
+    if (hunger > 0) {
         hunger = hunger - hungerConsumption;
         checkSurvival();
     }
     else {
         checkSurvival();
     }
-};
+}
 
 bool Animal::needsFood(){
     if (hunger >= maxHunger/4) {
@@ -89,23 +85,23 @@ bool Animal::needsFood(){
     }
     else
     return false;
-};
+}
 
 int Animal::getHealth(){
     return health;
-};
+}
 
 bool Animal::isAlive(){
     return isAliveState;
-};
+}
 
 string Animal::getSpecies(){
     return species;
-};
+}
 
 string Animal::getResourceType(){
     return producesResource;
-};
+}
     
 void Animal::collectResource(){
     if(hasResourceReady == true) {
@@ -113,11 +109,11 @@ void Animal::collectResource(){
         hasResourceReady = false;
         timeSinceLastProduction = 0;
     }
-};
+}
 
 bool Animal::hasResourceAvailable(){
     return hasResourceReady;
-};
+}
 
 void Animal::setTexture(Texture2D tex) {
     sprite = tex;
@@ -136,40 +132,36 @@ void Animal::draw(float x, float y, float width, float height) {
     }
 }
 
-
 void Animal::updateDaily() {
     thirst -= thirstConsumption;
-    if (thirst < 0) {thirst = 0;}
-    
-};
+    if (thirst < 0) {
+        thirst = 0;
+    }
+}
 
 void Animal::makeSound() {
     PlaySound(soundEffect);
 }
 
 void Animal::updateSoundTimer(float timeChange) {
-        if (soundCooldown > 0) {
-            soundCooldown -= timeChange;
-        } else {
-            // Random chance to play
-            if (GetRandomValue(0, 100) < 20) { // 20% chance
-                makeSound();
-            }
-            // Reset cooldown to random between 3-10 seconds
-            soundCooldown = GetRandomValue(3000, 10000) / 1000.0f;
+    if (soundCooldown > 0) {
+        soundCooldown -= timeChange;
+    } else {
+        // Random chance to play
+        if (GetRandomValue(0, 100) < 20) { // 20% chance
+            makeSound();
         }
+        // Reset cooldown to random between 3-10 seconds
+        soundCooldown = GetRandomValue(3000, 10000) / 1000.0f;
     }
+}
 
-    void Animal::drink() {
-        thirst = maxThirst;
+int Animal::getThirst() {
+    return thirst;
+}
+
+void Animal::setThirst(int x) {
+    if (x >= 0) {
+        thirst = x;
     }
-    
-    int Animal::getThirst() {
-        return thirst;
-    }
-    
-    void Animal::setThirst(int x) {
-        if (x >= 0) {
-            thirst = x;
-        }
-    }
+}
