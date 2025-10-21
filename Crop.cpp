@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include <sstream>
 #include "raylib-cpp.hpp"
 #include "raylib.h"
 #include "Crop.h"
@@ -80,4 +81,42 @@ int Crop::getWaterConsumption()
 bool Crop::IsWithering()
 {
     return false;
+}
+
+std::string Crop::getState()
+{
+    std::ostringstream oss;
+    oss << type;
+    switch (stage)
+    {
+    case SEED:
+        oss << ", Stage: Seed";
+        break;
+    case SEMI1:
+        oss << ", Stage: Sprout";
+        break;
+    case SEMI2:
+        oss << ", Stage: Mid";
+        break;
+    case FULL:
+        oss << ", Stage: Full";
+        break;
+    default:
+        oss << ", Stage: Unknown";
+        break;
+    }
+
+    oss << (isWatered ? " (Watered)" : " (Dry)");
+
+    if (IsWithering())
+    {
+        oss << ", Withering";
+    }
+
+    if (IsMature())
+    {
+        oss << ", Ready to Harvest";
+    }
+
+    return oss.str();
 }

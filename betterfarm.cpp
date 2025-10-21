@@ -667,6 +667,31 @@ int main()
             }
         }
 
+        // Draw crop tooltips
+        for (auto &t : tiles)
+        {
+            if (t.hasCrop() && CheckCollisionPointRec(mousePos, t.getRect()))
+            {
+                std::string cropStateText = t.getCrop()->getState();
+
+                float textWidth = MeasureText(cropStateText.c_str(), 14);
+                float textHeight = 18;
+                float tooltipX = mousePos.x + 10;
+                float tooltipY = mousePos.y + 10;
+
+                // Keep tooltip inside window
+                if (tooltipX + textWidth > GetScreenWidth())
+                    tooltipX = GetScreenWidth() - textWidth - 10;
+                if (tooltipY + textHeight > GetScreenHeight())
+                    tooltipY = GetScreenHeight() - textHeight - 10;
+
+                DrawRectangle(tooltipX - 4, tooltipY - 4, textWidth + 8, textHeight + 8,
+                              Fade(BLACK, 0.8f));
+                DrawText(cropStateText.c_str(), tooltipX, tooltipY, 14, WHITE);
+                break; // only show one tooltip at a time
+            }
+        }
+
         // Draw shop
         shop.Draw();
 

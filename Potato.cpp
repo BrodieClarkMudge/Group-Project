@@ -3,6 +3,7 @@
 Potato::Potato(float dt)
     : Stalk(dt) {
     waterConsumption = 10;
+    type = "PUMPKIN";
 }
 
 Potato::~Potato() {}

@@ -17,6 +17,8 @@ class Stalk : public Crop {
         ~Stalk();
     
         bool Harvest(int& payout) override;
+
+        std::string getType();
     };
         
 #endif

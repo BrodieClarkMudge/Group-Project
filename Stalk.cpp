@@ -15,6 +15,7 @@ Stalk::Stalk(float dt)
 
     : Crop(dt) {// calls base constructer
     waterConsumption = 8;
+    
 }
 
 Stalk::~Stalk() {}
