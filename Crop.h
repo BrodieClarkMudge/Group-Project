@@ -50,11 +50,6 @@ class Crop {
 
     virtual bool IsWithering();
 
-    std::string Crop::getType() {
-    return "CROP";
-}
-
-
     std::string getState();
 
 };

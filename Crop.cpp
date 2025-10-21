@@ -86,7 +86,6 @@ bool Crop::IsWithering()
 std::string Crop::getState()
 {
     std::ostringstream oss;
-    oss << type;
     switch (stage)
     {
     case SEED:
