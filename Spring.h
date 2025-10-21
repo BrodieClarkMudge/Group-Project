@@ -13,7 +13,6 @@ class Spring : public Season {
   std::string getName() const override;
   int getLength() const override;
   float getGrowthMultiplier() const override;
-  float getWitheringChance() const override;
   bool canHaveRain() const override;
   std::map<std::string, float> getWeatherProbability() const override;
 

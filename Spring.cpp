@@ -4,7 +4,6 @@ Spring::Spring() {
   name = "Spring";
   length = 30;
   growthMultiplier = 1.3f;  // Already faster
-  witheringChance = 0.1f;   // Pretty low
   canRain = true;
   canSnow = false;
   bloomEventActive = false;
@@ -22,8 +21,6 @@ int Spring::getLength() const { return length; }
 float Spring::getGrowthMultiplier() const {
   return bloomEventActive ? growthMultiplier + 0.2f : growthMultiplier;
 }
-
-float Spring::getWitheringChance() const { return witheringChance; }
 
 bool Spring::canHaveRain() const { return canRain; }
 
