@@ -168,7 +168,7 @@ int offsetY = (winHeight - areaHeight) / 2 + barHeight;
         dt = GetFrameTime() * timeScale; 
 
 
-        // ---- Thirst drain over time ----
+        // Thirst drain over time
         static float thirstTick = 0.0f; // static so it tracks between frames
         thirstTick += dt;
         if (thirstTick >= 0.7f) { // every 0.7 sec
