@@ -22,7 +22,7 @@ class Menu {
 
     void setSelectedOption(int opt);
 
-    int getSeletedOption();
+    int getSelectedOption();
 
 };
 

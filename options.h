@@ -25,7 +25,7 @@ class Options {
 
     void setSelectedOption(int opt);
 
-    int getSeletedOption();
+    int getSelectedOption();
 
     void setOptionsOpenTrue();
 
