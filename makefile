@@ -1,8 +1,6 @@
 # make
 # ./betterfarm
-# works on WSL / LINUX and MacOS
-
-
+# works on WSL / LINUX and MacOS   
 
 # For this cross platform related makefiles, since it was not included in course makefile description
 # nor was there anything clear online on how to run raylib on different OS's,
@@ -11,15 +9,17 @@
 # Detect OS and use correct Raylib link flags
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
+    CFLAGS = -I/usr/local/include
     LDFLAGS = -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
 endif
 ifeq ($(UNAME_S),Darwin)  # macOS
-    LDFLAGS = -lraylib -framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo
+    CFLAGS = -I/usr/local/include -I/opt/homebrew/include
+    LDFLAGS = -L/usr/local/lib -L/opt/homebrew/lib -lraylib -framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo
 endif
 
 # Build game 
 betterfarm: *.cpp
-	g++ -std=c++17 *.cpp -o betterfarm $(LDFLAGS)
+	g++ -std=c++17 $(CFLAGS) *.cpp -o betterfarm $(LDFLAGS)
 
 # Run game
 run: betterfarm
