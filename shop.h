@@ -4,11 +4,6 @@
 #include "raylib.h"
 #include "ui.h"
 #include "grid.h"
-#include "animal.h"
-#include "cow.h"
-#include "sheep.h"
-#include "chicken.h"
-#include "pig.h"
 #include <vector>
 #include <memory>
 
@@ -28,7 +23,7 @@ public:
     void Open() { open = true; }
     void Close() { open = false; }
 
-    void Update(std::vector<Tile>& tiles, int& coins,
+    void Update(std::vector<Tile>& tiles, int& coins, int& water,
                 Texture2D& yardTex, Texture2D& cowTex, Texture2D& sheepTex,
                 Texture2D& chickenTex, Texture2D& pigTex);
     void Draw();

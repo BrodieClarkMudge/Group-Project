@@ -181,29 +181,26 @@ int main() {
         // UI Button handling
         Rectangle topBar = {(float)offsetX, (float)(offsetY - ui.barHeight),
                             (float)areaWidth, (float)ui.barHeight};
-        Rectangle optionMenu = {topBar.x + 10, topBar.y + 10, 40, 40};
-        Rectangle hoe = {topBar.x + 100, topBar.y + 10, 40, 40};
-        Rectangle waterBtn = {topBar.x + 150, topBar.y + 10, 40, 40};
-        Rectangle shopUI = {topBar.x + 200, topBar.y + 10, 40, 40};
+        Rectangle optionMenu = {topBar.x + 10, topBar.y + 10, 50, 50};
+        Rectangle hoe = {topBar.x + 110, topBar.y + 10, 50, 50};
+        Rectangle waterBtn = {topBar.x + 170, topBar.y + 10, 50, 50};
+        Rectangle shopUI = {topBar.x + 230, topBar.y + 10, 50, 50};
 
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-        if (CheckCollisionPointRec(mousePos, optionMenu) && !ui.hoeing &&
-            !shop.getOpen() && !shop.getPlacing()) {
+        if (CheckCollisionPointRec(mousePos, optionMenu) && !ui.hoeing && !ui.watering && !shop.getOpen() && !shop.getPlacing()) {
             option.ShowOptions(option);
         }
 
-        if (CheckCollisionPointRec(mousePos, shopUI) &&
-            !option.getOptionsOpen() && !ui.hoeing) {
+        if (CheckCollisionPointRec(mousePos, shopUI) && !ui.watering && !option.getOptionsOpen() && !ui.hoeing) {
             shop.Open();
         }
 
-        if (CheckCollisionPointRec(mousePos, hoe) && !option.getOptionsOpen() &&
-            !shop.getPlacing() && !shop.getOpen()) {
+        if (CheckCollisionPointRec(mousePos, hoe) && !option.getOptionsOpen() && !shop.getPlacing() && !shop.getOpen()) {
             ui.hoeing = !ui.hoeing;
             if (ui.hoeing) ui.watering = false;
         }
 
-        if (CheckCollisionPointRec(mousePos, waterBtn)) {
+        if (CheckCollisionPointRec(mousePos, waterBtn) && !option.getOptionsOpen() && !shop.getPlacing() && !shop.getOpen()) {
             ui.watering = !ui.watering;
             if (ui.watering) ui.hoeing = false;
         }
@@ -213,14 +210,16 @@ int main() {
 
         // Update animal sounds
         for (auto& t : tiles) {
-        if (t.hasAnimal()) {
-            t.getAnimal()->updateSoundTimer(tile.getTimeChange());
-        }
-        if (t.hasAnimal() && IsMouseButtonPressed(MOUSE_RIGHT_BUTTON) &&
-            option.getSoundFX()) {
+    if (t.hasAnimal()) {
+        // Update automatic sound
+        t.getAnimal()->updateSoundTimer(tile.getTimeChange());
+
+        // Right-click sound (manual trigger)
+        if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON) && option.getSoundFX()) {
             t.getAnimal()->makeSound();
         }
-        }
+    }
+}
 
         // ----------------------
         // SHOP PLACEMENT MODE
@@ -235,81 +234,55 @@ int main() {
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
             for (auto& t : tiles) {
             if (CheckCollisionPointRec(mousePos, t.getRect())) {
-                if (shop.getSelectedItem() == "YARD" && ui.coins >= 20 &&
-                    t.getType() != TileType::YARD) {
-                t.setType(TileType::YARD);
-                ui.coins -= 20;
-                } else if (shop.getSelectedItem() == "COW" && ui.coins >= 50 &&
-                        t.getType() == TileType::YARD && !t.getAnimal()) {
-                t.setAnimal(
-                    std::make_unique<Cow>(tex.getCowTex(), tex.getCowSound()));
+                if (shop.getSelectedItem() == "YARD" && ui.coins >= 20 && t.getType() != TileType::YARD) {
+                    t.setType(TileType::YARD);
+                    ui.coins -= 20;
+                } else if (shop.getSelectedItem() == "COW" && ui.coins >= 50 && t.getType() == TileType::YARD && !t.getAnimal()) {
+                t.setAnimal(std::make_unique<Cow>(tex.getCowTex(), tex.getCowSound()));
                 ui.coins -= 50;
-                } else if (shop.getSelectedItem() == "SHEEP" && ui.coins >= 40 &&
-                        t.getType() == TileType::YARD && !t.getAnimal()) {
-                t.setAnimal(std::make_unique<Sheep>(tex.getSheepTex(),
-                                                    tex.getSheepSound()));
+                } else if (shop.getSelectedItem() == "SHEEP" && ui.coins >= 40 && t.getType() == TileType::YARD && !t.getAnimal()) {
+                t.setAnimal(std::make_unique<Sheep>(tex.getSheepTex(), tex.getSheepSound()));
                 ui.coins -= 40;
-                } else if (shop.getSelectedItem() == "CHICKEN" && ui.coins >= 30 &&
-                        t.getType() == TileType::YARD && !t.getAnimal()) {
-                t.setAnimal(std::make_unique<Chicken>(tex.getChickenTex(),
-                                                        tex.getChickenSound()));
+                } else if (shop.getSelectedItem() == "CHICKEN" && ui.coins >= 30 && t.getType() == TileType::YARD && !t.getAnimal()) {
+                t.setAnimal(std::make_unique<Chicken>(tex.getChickenTex(), tex.getChickenSound()));
                 ui.coins -= 30;
-                } else if (shop.getSelectedItem() == "PIG" && ui.coins >= 60 &&
-                        t.getType() == TileType::YARD && !t.getAnimal()) {
+                } else if (shop.getSelectedItem() == "PIG" && ui.coins >= 60 && t.getType() == TileType::YARD && !t.getAnimal()) {
                 t.setAnimal(
                     std::make_unique<Pig>(tex.getPigTex(), tex.getPigSound()));
                 ui.coins -= 60;
-                }
-                break;
-            }
-            }
-        }
-        }
+                } else if ((shop.getSelectedItem() == "PUMPKIN" || shop.getSelectedItem() == "TOMATO" || shop.getSelectedItem() == "POTATO") 
+                && ui.coins >= 10 && t.getType() == TileType::HOED && !t.getCrop()) {
 
-        // ----------------------
-        // CROP PLACEMENT/HARVEST
-        // ----------------------
-        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && !ui.hoeing && !ui.watering) {
-        for (auto& t : tiles) {
-            if (CheckCollisionPointRec(mousePos, t.getRect()) &&
-                t.getType() == TileType::HOED) {
-            if (t.hasCrop()) {
-                // Harvest only if mature
-                if (t.getCrop()->IsMature()) {
-                int payout = 0;
-                bool remove = t.getCrop()->Harvest(payout);
-                ui.coins += payout;
-                if (remove) t.removeCrop();
-                t.setCropTimer(0.0f);
+                    if (shop.getSelectedItem() == "PUMPKIN") {
+                        t.setCrop(std::make_unique<Pumpkin>(0.0));
+                        t.getCrop()->SetTexture(SEED, tex.getPumpkinSeed());
+                        t.getCrop()->SetTexture(SEMI1, tex.getPumpkinSprout());
+                        t.getCrop()->SetTexture(SEMI2, tex.getPumpkinMid());
+                        t.getCrop()->SetTexture(FULL, tex.getPumpkinFull());
+                        ui.coins -= 10;
+
+                    } else if (shop.getSelectedItem() == "TOMATO") {
+                        t.setCrop(std::make_unique<Tomato>(0.0));
+                        t.getCrop()->SetTexture(SEED, tex.getTomatoSeed());
+                        t.getCrop()->SetTexture(SEMI1, tex.getTomatoSprout());
+                        t.getCrop()->SetTexture(SEMI2, tex.getTomatoMid());
+                        t.getCrop()->SetTexture(FULL, tex.getTomatoFull());
+                        ui.coins -= 10;
+
+                    } else if (shop.getSelectedItem() == "POTATO") {
+                        t.setCrop(std::make_unique<Potato>(0.0));
+                        t.getCrop()->SetTexture(SEED, tex.getPotatoSeed());
+                        t.getCrop()->SetTexture(SEMI1, tex.getPotatoSprout());
+                        t.getCrop()->SetTexture(SEMI2, tex.getPotatoMid());
+                        t.getCrop()->SetTexture(FULL, tex.getPotatoFull());
+                        ui.coins -= 10;
+                    }
+
+                    t.setCropTimer(0.0f);
                 }
-            } else {
-                // Plant selected crop
-                switch (selectedCrop) {
-                case SelectedCrop::TOMATO:
-                    t.setCrop(std::make_unique<Tomato>(0.0));
-                    t.getCrop()->SetTexture(SEED, tex.getTomatoSeed());
-                    t.getCrop()->SetTexture(SEMI1, tex.getTomatoSprout());
-                    t.getCrop()->SetTexture(SEMI2, tex.getTomatoMid());
-                    t.getCrop()->SetTexture(FULL, tex.getTomatoFull());
-                    break;
-                case SelectedCrop::POTATO:
-                    t.setCrop(std::make_unique<Potato>(0.0));
-                    t.getCrop()->SetTexture(SEED, tex.getPotatoSeed());
-                    t.getCrop()->SetTexture(SEMI1, tex.getPotatoSprout());
-                    t.getCrop()->SetTexture(SEMI2, tex.getPotatoMid());
-                    t.getCrop()->SetTexture(FULL, tex.getPotatoFull());
-                    break;
-                case SelectedCrop::PUMPKIN:
-                    t.setCrop(std::make_unique<Pumpkin>(0.0));
-                    t.getCrop()->SetTexture(SEED, tex.getPumpkinSeed());
-                    t.getCrop()->SetTexture(SEMI1, tex.getPumpkinSprout());
-                    t.getCrop()->SetTexture(SEMI2, tex.getPumpkinMid());
-                    t.getCrop()->SetTexture(FULL, tex.getPumpkinFull());
-                    break;
-                }
-                t.setCropTimer(0.0f);
+
+                break; // Stop checking tiles once one is found
             }
-            break;
             }
         }
         }
@@ -337,11 +310,11 @@ int main() {
 
             bool didWater = false;
 
-            if (t.getType() == TileType::YARD && t.hasAnimal()) {
+            if (t.getType() == TileType::YARD && t.hasAnimal() && ui.water >= 100-t.getAnimal()->getThirst()) {
             ui.water -= (100 - t.getAnimal()->getThirst());
             t.getAnimal()->drink();
             didWater = true;
-            } else if (t.getType() == TileType::HOED && t.hasCrop()) {
+            } else if (t.getType() == TileType::HOED && t.hasCrop() && ui.water >= 100-t.getCrop()->getWaterAmount()) {
             ui.water -= (100 - t.getCrop()->getWaterAmount());
             t.getCrop()->Water();
             didWater = true;
@@ -426,7 +399,7 @@ int main() {
         }
 
         // Update shop
-        shop.Update(tiles, ui.coins, tex.getYardTex(), tex.getCowTex(),
+        shop.Update(tiles, ui.coins, ui.water, tex.getYardTex(), tex.getCowTex(),
                     tex.getSheepTex(), tex.getChickenTex(), tex.getPigTex());
 
         // ----------------------
@@ -470,18 +443,18 @@ int main() {
         const char* dayText = TextFormat("Day: %d", ui.currentDay);
         int dayTextWidth = MeasureText(dayText, 20);
         int dayX = offsetX + areaWidth / 2 - dayTextWidth / 2;
-        DrawText(dayText, dayX, topBar.y + 20, 20, BLACK);
+        DrawText(dayText, dayX, topBar.y + 40, 20, BLACK);
 
         // Coins (top-right)
         const char* coinText = TextFormat("Coins: %d", ui.coins);
         int coinTextWidth = MeasureText(coinText, 20);
         int coinX = offsetX + areaWidth - coinTextWidth - 20;
-        DrawText(coinText, coinX, topBar.y + 20, 20, BLACK);
+        DrawText(coinText, coinX, topBar.y + 40, 20, BLACK);
 
         // Water amount
         const char* waterText = TextFormat("Water: %d", ui.water);
         int waterTextWidth = MeasureText(waterText, 20);
-        DrawText(waterText, coinX - waterTextWidth - 30, topBar.y + 20, 20, BLACK);
+        DrawText(waterText, coinX - waterTextWidth - 30, topBar.y + 40, 20, BLACK);
 
         // Draw all tiles
         for (auto& t : tiles) {
@@ -582,7 +555,7 @@ int main() {
 
         // Draw shop placing indicator
        if(shop.getPlacing()) {
-            Rectangle placingShop = { topBar.x + 250, topBar.y + 10, 290, 40 };
+            Rectangle placingShop = { topBar.x + 290, topBar.y + 10, 290, 50 };
             DrawRectangleRec(placingShop, GOLD);
             DrawRectangleLinesEx(placingShop, 2, BROWN);
             DrawText("PLACING - to exit ENTER", (int)placingShop.x + 10, (int)placingShop.y + 10, 20, DARKPURPLE);
@@ -591,13 +564,6 @@ int main() {
             }
         }
 
-        // Draw simple weather info bar at bottom
-        int weatherBarHeight = 70;
-        int weatherBarY = winHeight - weatherBarHeight;
-
-        DrawRectangle(0, weatherBarY, winWidth, weatherBarHeight,
-                    Color{40, 40, 40, 255});
-        DrawLine(0, weatherBarY, winWidth, weatherBarY, Color{80, 80, 80, 255});
 
         auto* season = weatherSystem.getCurrentSeason();
         std::string seasonName = season->getName();
@@ -609,12 +575,10 @@ int main() {
         std::string weatherInfo = TextFormat(
             "Season: %s | Weather: %s | Growth: %.1fx | Days Left: %d",
             seasonName.c_str(), currentWeather.c_str(), growth, daysLeft);
-
-        DrawText(weatherInfo.c_str(), 20, weatherBarY + 8, 18, RAYWHITE);
-
-        // Crop instructions on second line
-        DrawText("5:Tomato  6:Potato  7:Pumpkin  LMB:Plant/Harvest", 20,
-                weatherBarY + 35, 18, RAYWHITE);
+        
+        int weatherWidth = MeasureText(weatherInfo.c_str(), 20);
+        int weatherX = offsetX + areaWidth - weatherWidth - 20;
+        DrawText(weatherInfo.c_str(), weatherX, topBar.y + 10, 20, DARKBLUE);
 
         EndDrawing();
     }

@@ -27,9 +27,7 @@ class Animal {
 
     Sound soundEffect;
     float soundCooldown = 0;
-
-
-
+    bool isPlaying = false;
 
     public:
     void calculateHealth();

@@ -21,7 +21,7 @@ struct UIState {
     const int initialWidth = 1280;
     const int initialHeight = 800;
     const float aspectRatio = 16.0f / 10.0f;
-    const int barHeight = 60;
+    const int barHeight = 70;
 
     // rectangles for interactive UI
     Rectangle optionsBackground;
@@ -29,15 +29,6 @@ struct UIState {
     Rectangle shopBackground;
     Rectangle topBar;
 };
-
-
-void InitUI();
-
-
-void DrawUI();
-
-
-void HandleUIInput();
 
 class FarmTextures {
     private:

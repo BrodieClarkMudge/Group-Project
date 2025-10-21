@@ -144,15 +144,20 @@ void Animal::makeSound() {
 }
 
 void Animal::updateSoundTimer(float timeChange) {
-    if (soundCooldown > 0) {
+    if (soundCooldown > 0.0f) {
         soundCooldown -= timeChange;
-    } else {
-        // Random chance to play
-        if (GetRandomValue(0, 100) < 20) { // 20% chance
-            //makeSound();
-        }
-        // Reset cooldown to random between 3-10 seconds
-        soundCooldown = GetRandomValue(3000, 10000) / 1000.0f;
+        return; // still on cooldown
+    }
+
+    // Attempt random play
+    if (GetRandomValue(0, 10000) < 5) { // ~0.05% chance per frame
+        makeSound();
+        soundCooldown = 2.0f + (GetRandomValue(10000, 30000) / 1000.0f); // 12–32 sec cooldown
+    }
+
+    // Reset isPlaying if sound finished
+    if (isPlaying && !IsSoundPlaying(soundEffect)) {
+        isPlaying = false;
     }
 }
 
