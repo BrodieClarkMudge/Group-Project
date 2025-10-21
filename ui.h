@@ -8,7 +8,7 @@
 
 // Struct for holding game UI state
 struct UIState {
-    int coins = 10000;
+    int coins = 700;
     int currentDay = 1;
     int water = 1000;
     bool hoeing = false;
