@@ -86,7 +86,7 @@ int main() {
     // ----------------------
     // UI positions
     // ----------------------
-    int coins = 10000;
+    //int ui.coins = 100;
     int water = 1000;
     int currentDay = 1;
     bool watering = false;
@@ -101,7 +101,7 @@ int main() {
         if (thirstTick >= 0.7f) {
             for (auto& t : tiles) {
                 if (t.hasAnimal()) {
-                    int thirst = t.getAnimal()->getThirst() - 2;
+                    int thirst = t.getAnimal()->getThirst() - 5;
                     if (thirst < 0) thirst = 0;
                     t.getAnimal()->setThirst(thirst);
                 }
@@ -111,7 +111,7 @@ int main() {
 
         // Apply health damage to dehydrated animals once per second
         dehydrateTick += dt;
-        if (dehydrateTick >= 0.7f) {
+        if (dehydrateTick >= 0.3f) {
             for (auto& t : tiles) {
                 if (t.hasAnimal() && t.getAnimal()->getThirst() == 0) {
                     t.getAnimal()->calculateHealth();
@@ -215,21 +215,21 @@ int main() {
             if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
                 for (auto& t : tiles) {
                     if (CheckCollisionPointRec(mouse, t.getRect())) {
-                        if (shop.getSelectedItem() == "YARD" && coins >= 20 && t.getType() != TileType::YARD) {
+                        if (shop.getSelectedItem() == "YARD" && ui.coins >= 30 && t.getType() != TileType::YARD) {
                             t.setType(TileType::YARD);
-                            coins -= 20;
-                        } else if (shop.getSelectedItem() == "COW" && coins >= 50 && t.getType() == TileType::YARD && !t.getAnimal()) {
+                            ui.coins -= 30;
+                        } else if (shop.getSelectedItem() == "COW" && ui.coins >= 80 && t.getType() == TileType::YARD && !t.getAnimal()) {
                             t.setAnimal(std::make_unique<Cow>(tex.getCowTex(), tex.getCowSound()));
-                            coins -= 50;
-                        } else if (shop.getSelectedItem() == "SHEEP" && coins >= 40 && t.getType() == TileType::YARD && !t.getAnimal()) {
+                            ui.coins -= 80;
+                        } else if (shop.getSelectedItem() == "SHEEP" && ui.coins >= 60 && t.getType() == TileType::YARD && !t.getAnimal()) {
                             t.setAnimal(std::make_unique<Sheep>(tex.getSheepTex(), tex.getSheepSound()));
-                            coins -= 40;
-                        } else if (shop.getSelectedItem() == "CHICKEN" && coins >= 30 && t.getType() == TileType::YARD && !t.getAnimal()) {
+                            ui.coins -= 60;
+                        } else if (shop.getSelectedItem() == "CHICKEN" && ui.coins >= 40 && t.getType() == TileType::YARD && !t.getAnimal()) {
                             t.setAnimal(std::make_unique<Chicken>(tex.getChickenTex(), tex.getChickenSound()));
-                            coins -= 30;
-                        } else if (shop.getSelectedItem() == "PIG" && coins >= 60 && t.getType() == TileType::YARD && !t.getAnimal()) {
+                            ui.coins -= 40;
+                        } else if (shop.getSelectedItem() == "PIG" && ui.coins >= 100 && t.getType() == TileType::YARD && !t.getAnimal()) {
                             t.setAnimal(std::make_unique<Pig>(tex.getPigTex(), tex.getPigSound()));
-                            coins -= 60;
+                            ui.coins -= 100;
                         }
 
                         break; // place only once per click
@@ -248,7 +248,7 @@ int main() {
                         if (t.getCrop()->IsMature()) {
                             int payout = 0;
                             bool remove = t.getCrop()->Harvest(payout);
-                            coins += payout;
+                            ui.coins += payout;
                             if (remove) t.removeCrop();
                             t.setCropTimer(0.0f);
                         }
@@ -301,11 +301,25 @@ int main() {
 
                 bool didWater = false;
 
-                // Animal on yard - water
+                // Animal on yard - water 
                 if (t.getType() == TileType::YARD && t.hasAnimal()) {
-                    water = water - (100 - t.getAnimal()->getThirst());
-                    t.getAnimal()->drink();
-                    didWater = true;
+                    int need = 100 - t.getAnimal()->getThirst();
+                    if (need > 0 && water > 0) {
+                        int give = need;
+                        // INPUT VALIDATION
+                        if (give > water) {
+                            give = water;  // don't give more water than we have to avoid negative
+                        }
+
+                        water -= give;
+
+                        int newThirst = t.getAnimal()->getThirst() + give;
+                        if (newThirst > 100) {
+                            newThirst = 100;
+                        }
+                        t.getAnimal()->setThirst(newThirst);
+                        didWater = true;
+                    }
                 }
                 // Crop on hoed - water
                 else if (t.getType() == TileType::HOED && t.hasCrop()) {
@@ -338,7 +352,7 @@ int main() {
             float waterDecayTimer = t.getWaterDecayTimer() + dt;
             t.setWaterDecayTimer(waterDecayTimer);
 
-            while (t.getWaterDecayTimer() >= 0.2f) {
+            while (t.getWaterDecayTimer() >= 0.15f) {
                 int w = t.getCrop()->getWaterAmount();
                 if (w > 0) {
                     w -= t.getCrop()->getWaterConsumption();
@@ -388,8 +402,8 @@ int main() {
         int dayX = offsetX + areaWidth/2 - dayTextWidth/2;
         DrawText(dayText, dayX, topBar.y + 20, 20, BLACK);
 
-        // Coins (top-right inside bar)
-        const char* coinText = TextFormat("Coins: %d", coins);
+        // ui.coins (top-right inside bar)
+        const char* coinText = TextFormat("Coins: %d", ui.coins);
         int coinTextWidth = MeasureText(coinText, 20);
         int coinX = offsetX + areaWidth - coinTextWidth - 20;
         DrawText(coinText, coinX, topBar.y + 20, 20, BLACK);
@@ -443,13 +457,14 @@ int main() {
             if (t.hasCrop()) {
                 float cropTimer = t.getCropTimer() + dt;
                 t.setCropTimer(cropTimer);
-
-                float growEvery = 5.0f;
+                // grow every 5 secs if watered
+                float growEvery = 12.0f;
                 if (t.getCropTimer() >= growEvery && t.getCrop()->getWaterAmount() > 0) {
                     t.getCrop()->Grow();
                     t.setCropTimer(0.0f);
                 }
 
+                // to kill wither prone crops
                 if (t.getCrop()->IsWithering() && t.getCrop()->IsMature()) {
                     float ripeTimer = t.getRipeTimer() + dt;
                     t.setRipeTimer(ripeTimer);
@@ -503,7 +518,7 @@ int main() {
             shop.Open();
         }
 
-        shop.Update(tiles, coins, tex.getYardTex(), tex.getCowTex(), tex.getSheepTex(), tex.getChickenTex(), tex.getPigTex());
+        shop.Update(tiles, ui.coins, tex.getYardTex(), tex.getCowTex(), tex.getSheepTex(), tex.getChickenTex(), tex.getPigTex());
         shop.Draw();
 
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && CheckCollisionPointRec(mousePos, hoe) && option.getOptionsOpen() == false && shop.getPlacing() == false && shop.getOpen() == false) {
@@ -520,7 +535,7 @@ int main() {
         }
 
         // Hoe to follow cursor
-        if (ui.hoeing == true && coins >= 5 && shop.getPlacing() == false) {
+        if (ui.hoeing == true && ui.coins >= 5 && shop.getPlacing() == false) {
             DrawTexturePro(
                 tex.getHoeTex(),
                 Rectangle{0, 0, (float)tex.getHoeTex().width, (float)tex.getHoeTex().height},
@@ -529,7 +544,7 @@ int main() {
             for (auto &t : tiles) {
                 if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && t.getType() == TileType::GRASS && CheckCollisionPointRec(mousePos, t.getRect())) {
                      t.setType(TileType::HOED);
-                     coins = coins - 5;
+                     ui.coins = ui.coins - 5;
                 }
             }
         }

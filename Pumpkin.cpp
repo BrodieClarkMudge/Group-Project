@@ -5,10 +5,11 @@ Pumpkin::Pumpkin(float dt)
 {
     // set how long it survives after maturity before dying
     SetTimeBeforeDeath(7.0f); // 7 seconds before auto-death
+    waterConsumption = 30;
 }
 
 Pumpkin::~Pumpkin() = default;
 
 int Pumpkin::GetSellPrice() {
-    return 30; // worth more
+    return 60; // worth more
 }

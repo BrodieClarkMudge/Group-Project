@@ -27,7 +27,8 @@ SRCS := betterfarm.cpp \
         Stalk.cpp \
         Withering.cpp \
         Potato.cpp \
-        Pumpkin.cpp
+        Pumpkin.cpp \
+        Tomato.cpp
 
 # === Object files ===
 OBJS := $(SRCS:.cpp=.o)

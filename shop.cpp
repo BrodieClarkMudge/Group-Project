@@ -87,11 +87,11 @@ void Shop::Draw() {
     DrawRectangleLinesEx(windowRect, 2, BLACK);
 
     DrawText("Shop", windowRect.x + 150, windowRect.y + 10, 30, BLACK);
-    DrawText("Buy Yard - 20 coins", windowRect.x + 30, windowRect.y + 60, 20, DARKGREEN);
-    DrawText("Buy Cow - 50 coins", windowRect.x + 30, windowRect.y + 110, 20, BROWN);
-    DrawText("Buy Sheep - 40 coins", windowRect.x + 30, windowRect.y + 160, 20, GRAY);
-    DrawText("Buy Chicken - 30 coins", windowRect.x + 30, windowRect.y + 210, 20, DARKGRAY);
-    DrawText("Buy Pig - 60 coins", windowRect.x + 30, windowRect.y + 260, 20, MAROON);
+    DrawText("Buy Yard - 30 coins", windowRect.x + 30, windowRect.y + 60, 20, DARKGREEN);
+    DrawText("Buy Cow - 80 coins", windowRect.x + 30, windowRect.y + 110, 20, BROWN);
+    DrawText("Buy Sheep - 60 coins", windowRect.x + 30, windowRect.y + 160, 20, GRAY);
+    DrawText("Buy Chicken - 40 coins", windowRect.x + 30, windowRect.y + 210, 20, DARKGRAY);
+    DrawText("Buy Pig - 100 coins", windowRect.x + 30, windowRect.y + 260, 20, MAROON);
     if (expandedGrid == 0) {
         DrawText("Expand farm - 500 coins", windowRect.x + 30, windowRect.y + 310, 20, GOLD);
     } else if (expandedGrid == 1) {
