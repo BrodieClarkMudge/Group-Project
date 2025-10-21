@@ -28,7 +28,7 @@ void Shop::Update(std::vector<Tile>& tiles, int& coins, int& water,
 
     // Cow button
     Rectangle cowBtn = { windowRect.x + 20, windowRect.y + 100, (float)buttonWidth, (float)buttonHeight };
-    if (CheckCollisionPointRec(mousePos, cowBtn) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && coins >= 50) {
+    if (CheckCollisionPointRec(mousePos, cowBtn) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && coins >= 200) {
         setSelectedItem("COW");
         placing = true;
         open = false;
@@ -36,7 +36,7 @@ void Shop::Update(std::vector<Tile>& tiles, int& coins, int& water,
 
     // Sheep button
     Rectangle sheepBtn = { windowRect.x + 20, windowRect.y + 150, (float)buttonWidth, (float)buttonHeight };
-    if (CheckCollisionPointRec(mousePos, sheepBtn) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && coins >= 40) {
+    if (CheckCollisionPointRec(mousePos, sheepBtn) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && coins >= 100) {
         setSelectedItem("SHEEP");
         placing = true;
         open = false;
@@ -44,7 +44,7 @@ void Shop::Update(std::vector<Tile>& tiles, int& coins, int& water,
 
     // Chicken button
     Rectangle chickenBtn = { windowRect.x + 20, windowRect.y + 200, (float)buttonWidth, (float)buttonHeight };
-    if (CheckCollisionPointRec(mousePos, chickenBtn) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && coins >= 30) {
+    if (CheckCollisionPointRec(mousePos, chickenBtn) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && coins >= 50) {
         setSelectedItem("CHICKEN");
         placing = true;
         open = false;
@@ -52,28 +52,28 @@ void Shop::Update(std::vector<Tile>& tiles, int& coins, int& water,
 
     // Pig button
     Rectangle pigBtn = { windowRect.x + 20, windowRect.y + 250, (float)buttonWidth, (float)buttonHeight };
-    if (CheckCollisionPointRec(mousePos, pigBtn) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && coins >= 60) {
+    if (CheckCollisionPointRec(mousePos, pigBtn) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && coins >= 250) {
         setSelectedItem("PIG");
         placing = true;
         open = false;
     }
 
     Rectangle pumpkinBtn = { windowRect.x + 300, windowRect.y + 50, (float)buttonWidth, (float)buttonHeight };
-    if (CheckCollisionPointRec(mousePos, pumpkinBtn) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && coins >= 10) {
+    if (CheckCollisionPointRec(mousePos, pumpkinBtn) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && coins >= 120) {
         setSelectedItem("PUMPKIN");
         placing = true;
         open = false;
     }
 
     Rectangle tomatoBtn = { windowRect.x + 300, windowRect.y + 100, (float)buttonWidth, (float)buttonHeight };
-    if (CheckCollisionPointRec(mousePos, tomatoBtn) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && coins >= 10) {
+    if (CheckCollisionPointRec(mousePos, tomatoBtn) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && coins >= 50) {
         setSelectedItem("TOMATO");
         placing = true;
         open = false;
     }
 
     Rectangle potatoBtn = { windowRect.x + 300, windowRect.y + 150, (float)buttonWidth, (float)buttonHeight };
-    if (CheckCollisionPointRec(mousePos, potatoBtn) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && coins >= 10) {
+    if (CheckCollisionPointRec(mousePos, potatoBtn) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && coins >= 60) {
         setSelectedItem("POTATO");
         placing = true;
         open = false;
@@ -81,8 +81,8 @@ void Shop::Update(std::vector<Tile>& tiles, int& coins, int& water,
 
     Rectangle addWaterBtn = { windowRect.x + 300, windowRect.y + 200, (float)buttonWidth, (float)buttonHeight };
     if (CheckCollisionPointRec(mousePos, addWaterBtn) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && coins >= 50) {
-        water += 10;
-        coins -= 50;
+        water += 500;
+        coins -= 40;
     }
 
     Rectangle expand = { windowRect.x + 300, windowRect.y + 250, (float)buttonWidth, (float)buttonHeight };
@@ -116,14 +116,14 @@ void Shop::Draw() {
 
     DrawText("Shop", windowRect.x + 260, windowRect.y + 10, 30, BLACK);
     DrawText("Buy Yard - 20 coins", windowRect.x + 30, windowRect.y + 60, 20, DARKGREEN);
-    DrawText("Buy Cow - 50 coins", windowRect.x + 30, windowRect.y + 110, 20, BROWN);
-    DrawText("Buy Sheep - 40 coins", windowRect.x + 30, windowRect.y + 160, 20, GRAY);
-    DrawText("Buy Chicken - 30 coins", windowRect.x + 30, windowRect.y + 210, 20, DARKGRAY);
-    DrawText("Buy Pig - 60 coins", windowRect.x + 30, windowRect.y + 260, 20, MAROON);
-    DrawText("Buy Pumpkin Seed - 10 coins", windowRect.x + 310, windowRect.y + 60, 20, ORANGE);
-    DrawText("Buy Tomato Seed - 10 coins", windowRect.x + 310, windowRect.y + 110, 20, RED);
-    DrawText("Buy Potato Seed - 10 coins", windowRect.x + 310, windowRect.y + 160, 20, DARKBROWN);
-    DrawText("Buy 10 Water - 50 coins", windowRect.x + 310, windowRect.y + 210, 20, BLUE);
+    DrawText("Buy Cow - 200 coins", windowRect.x + 30, windowRect.y + 110, 20, BROWN);
+    DrawText("Buy Sheep - 100 coins", windowRect.x + 30, windowRect.y + 160, 20, GRAY);
+    DrawText("Buy Chicken - 50 coins", windowRect.x + 30, windowRect.y + 210, 20, DARKGRAY);
+    DrawText("Buy Pig - 250 coins", windowRect.x + 30, windowRect.y + 260, 20, MAROON);
+    DrawText("Buy Pumpkin Seed - 120 coins", windowRect.x + 310, windowRect.y + 60, 20, ORANGE);
+    DrawText("Buy Tomato Seed - 50 coins", windowRect.x + 310, windowRect.y + 110, 20, RED);
+    DrawText("Buy Potato Seed - 60 coins", windowRect.x + 310, windowRect.y + 160, 20, DARKBROWN);
+    DrawText("Buy 500 Water - 40 coins", windowRect.x + 310, windowRect.y + 210, 20, BLUE);
     if (expandedGrid == 0) {
         DrawText("Expand farm - 500 coins", windowRect.x + 310, windowRect.y + 260, 20, GOLD);
     } else if (expandedGrid == 1) {

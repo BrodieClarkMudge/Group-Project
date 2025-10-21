@@ -21,6 +21,7 @@
 #include "Stalk.h"
 #include "Tomato.h"
 #include "WeatherSystem.h"
+#include "Save.h"
 
 // Timing global variables to be used in animals and crops
 int main()
@@ -264,7 +265,7 @@ int main()
                 shop.setPlacingFalse();
                 shop.setSelectedItem("");
             }
-
+            
             if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
             {
                 for (auto &t : tiles)
@@ -276,26 +277,26 @@ int main()
                             t.setType(TileType::YARD);
                             ui.coins -= 20;
                         }
-                        else if (shop.getSelectedItem() == "COW" && ui.coins >= 50 && t.getType() == TileType::YARD && !t.getAnimal())
+                        else if (shop.getSelectedItem() == "COW" && ui.coins >= 200 && t.getType() == TileType::YARD && !t.getAnimal())
                         {
                             t.setAnimal(std::make_unique<Cow>(tex.getCowTex(), tex.getCowSound()));
-                            ui.coins -= 50;
+                            ui.coins -= 200;
                         }
-                        else if (shop.getSelectedItem() == "SHEEP" && ui.coins >= 40 && t.getType() == TileType::YARD && !t.getAnimal())
+                        else if (shop.getSelectedItem() == "SHEEP" && ui.coins >= 100 && t.getType() == TileType::YARD && !t.getAnimal())
                         {
                             t.setAnimal(std::make_unique<Sheep>(tex.getSheepTex(), tex.getSheepSound()));
-                            ui.coins -= 40;
+                            ui.coins -= 100;
                         }
-                        else if (shop.getSelectedItem() == "CHICKEN" && ui.coins >= 30 && t.getType() == TileType::YARD && !t.getAnimal())
+                        else if (shop.getSelectedItem() == "CHICKEN" && ui.coins >= 50 && t.getType() == TileType::YARD && !t.getAnimal())
                         {
                             t.setAnimal(std::make_unique<Chicken>(tex.getChickenTex(), tex.getChickenSound()));
-                            ui.coins -= 30;
+                            ui.coins -= 50;
                         }
-                        else if (shop.getSelectedItem() == "PIG" && ui.coins >= 60 && t.getType() == TileType::YARD && !t.getAnimal())
+                        else if (shop.getSelectedItem() == "PIG" && ui.coins >= 250 && t.getType() == TileType::YARD && !t.getAnimal())
                         {
                             t.setAnimal(
                                 std::make_unique<Pig>(tex.getPigTex(), tex.getPigSound()));
-                            ui.coins -= 60;
+                            ui.coins -= 250;
                         }
                         else if ((shop.getSelectedItem() == "PUMPKIN" || shop.getSelectedItem() == "TOMATO" || shop.getSelectedItem() == "POTATO") && ui.coins >= 10 && t.getType() == TileType::HOED && !t.getCrop())
                         {
@@ -307,7 +308,7 @@ int main()
                                 t.getCrop()->SetTexture(SEMI1, tex.getPumpkinSprout());
                                 t.getCrop()->SetTexture(SEMI2, tex.getPumpkinMid());
                                 t.getCrop()->SetTexture(FULL, tex.getPumpkinFull());
-                                ui.coins -= 10;
+                                ui.coins -= 120;
                             }
                             else if (shop.getSelectedItem() == "TOMATO")
                             {
@@ -316,7 +317,7 @@ int main()
                                 t.getCrop()->SetTexture(SEMI1, tex.getTomatoSprout());
                                 t.getCrop()->SetTexture(SEMI2, tex.getTomatoMid());
                                 t.getCrop()->SetTexture(FULL, tex.getTomatoFull());
-                                ui.coins -= 10;
+                                ui.coins -= 50;
                             }
                             else if (shop.getSelectedItem() == "POTATO")
                             {
@@ -325,7 +326,7 @@ int main()
                                 t.getCrop()->SetTexture(SEMI1, tex.getPotatoSprout());
                                 t.getCrop()->SetTexture(SEMI2, tex.getPotatoMid());
                                 t.getCrop()->SetTexture(FULL, tex.getPotatoFull());
-                                ui.coins -= 10;
+                                ui.coins -= 60;
                             }
 
                             t.setCropTimer(0.0f);
@@ -388,6 +389,28 @@ int main()
         }
 
         // ----------------------
+        // CROP HARVESTING
+        // ----------------------
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && !ui.hoeing &&
+            !ui.watering && !shop.getPlacing()) {
+          for (auto& t : tiles) {
+            if (CheckCollisionPointRec(mousePos, t.getRect()) && t.hasCrop()) {
+              // Harvest only if mature
+              if (t.getCrop()->IsMature()) {
+                int payout = 0;
+                bool remove = t.getCrop()->Harvest(payout);
+                ui.coins += payout;
+                if (remove) {
+                  t.removeCrop();
+                }
+                t.setCropTimer(0.0f);
+                break;
+              }
+            }
+          }
+        }
+
+        // ----------------------
         // UPDATE LOGIC
         // ----------------------
 
@@ -413,8 +436,9 @@ int main()
             float waterDecayTimer = t.getWaterDecayTimer() + ui.dt;
             t.setWaterDecayTimer(waterDecayTimer);
 
-            while (t.getWaterDecayTimer() >= 0.2f)
+            while (t.getWaterDecayTimer() >= 2.0f)
             {
+                // INPUT VALIDATION - cant go negative
                 int w = t.getCrop()->getWaterAmount();
                 if (w > 0)
                 {
@@ -423,7 +447,7 @@ int main()
                         w = 0;
                     t.getCrop()->SetWaterAmount(w);
                 }
-                t.setWaterDecayTimer(t.getWaterDecayTimer() - 0.2f);
+                t.setWaterDecayTimer(t.getWaterDecayTimer() - 2.0f);
             }
         }
 
@@ -451,7 +475,7 @@ int main()
                 growthMultiplier *= 1.1f;
             }
 
-            float growEvery = 5.0f / growthMultiplier;
+            float growEvery = 8.0f / growthMultiplier;
 
             if (t.getCropTimer() >= growEvery && t.getCrop()->getWaterAmount() > 0)
             {
@@ -693,6 +717,14 @@ int main()
         DrawText(weatherInfo.c_str(), weatherX, topBar.y + 10, 20, DARKBLUE);
 
         EndDrawing();
+
+        // SAVE & LOAD
+        if (IsKeyPressed(KEY_S)) {
+          SaveGame(ui.coins, ui.water);
+        }
+        if (IsKeyPressed(KEY_L)) {
+          LoadGame(ui.coins, ui.water);
+        }
     }
 
     CloseAudioDevice();

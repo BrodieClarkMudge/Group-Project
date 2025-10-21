@@ -2,11 +2,11 @@
 
 Potato::Potato(float dt)
     : Stalk(dt) {
-    waterConsumption = 12;
+    waterConsumption = 10;
 }
 
 Potato::~Potato() {}
 
 int Potato::GetSellPrice() {
-    return 18;
+    return 120;
 }
