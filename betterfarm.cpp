@@ -13,7 +13,6 @@
 #include "Crop.h"
 #include "Regenerating.h"
 #include "Stalk.h"
-#include "Large.h"
 #include "Berry.h"
 #include "Potato.h"
 #include "Pumpkin.h"
