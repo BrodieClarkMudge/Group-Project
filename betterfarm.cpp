@@ -474,7 +474,7 @@ int main() {
         for (auto& t : tiles) {
             if (t.hasAnimal() && CheckCollisionPointRec(mousePos, t.getRect())) {
                 // Get the animal's state string
-                std::string stateText = t.getAnimal()->getState();
+                string stateText = t.getAnimal()->getState();
 
                 // Determine tooltip position
                 float textWidth = MeasureText(stateText.c_str(), 14);
