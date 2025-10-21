@@ -4,7 +4,6 @@ Autumn::Autumn() {
   name = "Autumn";
   length = 28;              // Slightly shorter season
   growthMultiplier = 1.0f;  // Normal growth
-  witheringChance = 0.1f;   // Lower chance to wither
   canRain = true;
   canSnow = false;
   heavyRainActive = false;
@@ -26,8 +25,6 @@ std::string Autumn::getName() const { return name; }
 int Autumn::getLength() const { return length; }
 
 float Autumn::getGrowthMultiplier() const { return growthMultiplier; }
-
-float Autumn::getWitheringChance() const { return witheringChance; }
 
 bool Autumn::canHaveRain() const { return canRain; }
 
