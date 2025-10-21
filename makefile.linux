@@ -26,7 +26,6 @@ SRCS := betterfarm.cpp \
         Regenerating.cpp \
         Stalk.cpp \
         Withering.cpp \
-        Berry.cpp \
         Potato.cpp \
         Pumpkin.cpp
 

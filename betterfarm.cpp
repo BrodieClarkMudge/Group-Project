@@ -13,9 +13,9 @@
 #include "Crop.h"
 #include "Regenerating.h"
 #include "Stalk.h"
-#include "Berry.h"
 #include "Potato.h"
 #include "Pumpkin.h"
+#include "Tomato.h"
 
 #include <vector>
 #include <string>
@@ -62,8 +62,8 @@ int main() {
 
     std::vector<Tile> tiles;
 
-    enum class SelectedCrop { BERRY, POTATO, PUMPKIN };
-    SelectedCrop selectedCrop = SelectedCrop::BERRY;
+    enum class SelectedCrop { TOMATO, POTATO, PUMPKIN };
+    SelectedCrop selectedCrop = SelectedCrop::TOMATO;
 
     // Load crop stage textures
     Texture2D potatoSeed = LoadTexture("assets/1 - Potato Seed.png");
@@ -187,7 +187,7 @@ int main() {
         }
 
         // Crop selection
-        if (IsKeyPressed(KEY_FIVE))   selectedCrop = SelectedCrop::BERRY;
+        if (IsKeyPressed(KEY_FIVE))   selectedCrop = SelectedCrop::TOMATO;
         if (IsKeyPressed(KEY_SIX))    selectedCrop = SelectedCrop::POTATO;
         if (IsKeyPressed(KEY_SEVEN))  selectedCrop = SelectedCrop::PUMPKIN;
 
@@ -197,7 +197,7 @@ int main() {
             if (t.hasAnimal()) {
                 t.getAnimal()->updateSoundTimer(tile.getTimeChange());
             }
-            if (t.hasAnimal() && IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
+            if (t.hasAnimal() && IsMouseButtonPressed(MOUSE_RIGHT_BUTTON) && option.getSoundFX()) {
                 t.getAnimal()->makeSound();
             }
         }
@@ -255,8 +255,8 @@ int main() {
                     } else {
                         // Plant selected crop
                         switch (selectedCrop) {
-                            case SelectedCrop::BERRY:
-                                t.setCrop(std::make_unique<Berry>(0.0));
+                            case SelectedCrop::TOMATO:
+                                t.setCrop(std::make_unique<Tomato>(0.0));
                                 break;
                             case SelectedCrop::POTATO:
                                 t.setCrop(std::make_unique<Potato>(0.0));
@@ -268,7 +268,7 @@ int main() {
 
                         // Assign crop textures based on type
                         switch (selectedCrop) {
-                            case SelectedCrop::BERRY:
+                            case SelectedCrop::TOMATO:
                                 t.getCrop()->SetTexture(SEED,  tomatoSeed);
                                 t.getCrop()->SetTexture(SEMI1, tomatoSprout);
                                 t.getCrop()->SetTexture(SEMI2, tomatoMid);
@@ -465,7 +465,7 @@ int main() {
             }
         }
 
-        DrawText("5:Berry  6:Potato  7:Pumpkin  LMB:Plant/Harvest", 20, winHeight - 60, 20, RAYWHITE);
+        DrawText("5:Tomato  6:Potato  7:Pumpkin  LMB:Plant/Harvest", 20, winHeight - 60, 20, RAYWHITE);
         DrawText("Arrow Up/Down: Resize Grid", 20, winHeight - 40, 20, RAYWHITE);
         DrawText("BetterFarm++ OOP (16:10)", 20, winHeight - 20, 20, RAYWHITE);
 

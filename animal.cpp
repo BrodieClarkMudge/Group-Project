@@ -149,7 +149,7 @@ void Animal::updateSoundTimer(float timeChange) {
     } else {
         // Random chance to play
         if (GetRandomValue(0, 100) < 20) { // 20% chance
-            makeSound();
+            //makeSound();
         }
         // Reset cooldown to random between 3-10 seconds
         soundCooldown = GetRandomValue(3000, 10000) / 1000.0f;
