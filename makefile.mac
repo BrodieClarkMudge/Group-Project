@@ -1,35 +1,25 @@
-test: animals.cpp
-	clang++ animals.cpp -o game \
-    -std=c++17 \
-    -I/opt/homebrew/include \
-    -L/opt/homebrew/lib \
-    -lraylib \
-    -framework Cocoa \
-    -framework IOKit \
-    -framework CoreVideo \
-    -framework OpenGL
-	./game
+CXX = clang++
+CXXFLAGS = -std=c++17 -I. -I/opt/homebrew/include
+LDFLAGS = -L/opt/homebrew/lib -lraylib -framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo
 
-square : raylibSquare.cpp
-	clang++ raylibSquare.cpp -o square \
-    -std=c++17 \
-    -I/opt/homebrew/include \
-    -L/opt/homebrew/lib \
-    -lraylib \
-    -framework Cocoa \
-    -framework IOKit \
-    -framework CoreVideo \
-    -framework OpenGL
-	./square
+# Source files for Weather Panel Testing
+WEATHER_SRCS = testing.cpp WeatherSystem.cpp Spring.cpp Summer.cpp Autumn.cpp Winter.cpp
+WEATHER_TARGET = weatherbox
 
-farm : betterfarm.cpp pig.cpp sheep.cpp cow.cpp chicken.cpp animal.cpp menu.cpp options.cpp grid.cpp shop.cpp ui.cpp
-	clang++ betterfarm.cpp pig.cpp sheep.cpp cow.cpp chicken.cpp animal.cpp menu.cpp options.cpp grid.cpp shop.cpp ui.cpp -o farm \
-    -std=c++17 \
-    -I/opt/homebrew/include \
-    -L/opt/homebrew/lib \
-    -lraylib \
-    -framework Cocoa \
-    -framework IOKit \
-    -framework CoreVideo \
-    -framework OpenGL
-	./farm
+# Source files for Full Game Build
+FARM_SRCS = betterfarm.cpp pig.cpp sheep.cpp cow.cpp chicken.cpp animal.cpp menu.cpp options.cpp grid.cpp shop.cpp ui.cpp WeatherSystem.cpp Spring.cpp Summer.cpp Autumn.cpp Winter.cpp
+FARM_TARGET = farm
+
+# Build weather test
+weather: $(WEATHER_SRCS)
+	$(CXX) $(WEATHER_SRCS) -o $(WEATHER_TARGET) $(CXXFLAGS) $(LDFLAGS)
+	./$(WEATHER_TARGET)
+
+# Build full game
+farm: $(FARM_SRCS)
+	$(CXX) $(FARM_SRCS) -o $(FARM_TARGET) $(CXXFLAGS) $(LDFLAGS)
+	./$(FARM_TARGET)
+
+# Clean binaries
+clean:
+	rm -f $(WEATHER_TARGET) $(FARM_TARGET) *.o
