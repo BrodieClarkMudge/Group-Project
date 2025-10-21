@@ -1,0 +1,36 @@
+# ===== Linux/WSL Makefile =====
+CXX := g++
+CXXFLAGS := -std=c++17 -O2 -Wall -Wextra
+
+# detect raylib via pkg-config, fallback if not found
+RAYLIB_CFLAGS := $(shell pkg-config --cflags raylib 2>/dev/null)
+RAYLIB_LIBS   := $(shell pkg-config --libs   raylib 2>/dev/null)
+ifeq ($(strip $(RAYLIB_LIBS)),)
+  RAYLIB_CFLAGS :=
+  RAYLIB_LIBS := -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
+endif
+
+# === source files ===
+SRCS := betterfarm.cpp \
+        grid.cpp \
+        shop.cpp ui.cpp \
+        animal.cpp pig.cpp sheep.cpp cow.cpp chicken.cpp \
+        menu.cpp options.cpp \
+        Crop.cpp Regenerating.cpp Stalk.cpp Withering.cpp \
+        Berry.cpp Potato.cpp Pumpkin.cpp
+
+# === object files ===
+OBJS := $(SRCS:.cpp=.o)
+
+.PHONY: all clean
+
+all: farm
+
+farm: $(OBJS)
+	$(CXX) $(CXXFLAGS) $(RAYLIB_CFLAGS) $(OBJS) -o farm $(RAYLIB_LIBS)
+
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) $(RAYLIB_CFLAGS) -c $< -o $@
+
+clean:
+	rm -f farm $(OBJS)
