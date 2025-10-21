@@ -6,7 +6,7 @@
 
 class Season {
  protected:
-  int length; 
+  int length;
   std::string name;
   int defaultWater;
   int dayLength;
@@ -30,7 +30,6 @@ class Season {
   // Returns the growth rate multiplier for crops during this season
   // (e.g., 1.0 = normal growth, >1.0 = faster, <1.0 = slower)
   virtual float getGrowthMultiplier() const = 0;
-
 
   // Indicates whether this season supports rain events
   virtual bool canHaveRain() const = 0;

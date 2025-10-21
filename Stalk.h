@@ -1,22 +1,20 @@
 #ifndef STALK_H
 #define STALK_H
 
-#include <vector>
-#include <string>
 #include <memory>
-#include "raylib-cpp.hpp"
-#include "menu.h"
+#include <string>
+#include <vector>
+
 #include "Crop.h"
-
-
-
+#include "menu.h"
+#include "raylib-cpp.hpp"
 
 class Stalk : public Crop {
-    public:
-        Stalk(float dt);
-        ~Stalk();
-    
-        bool Harvest(int& payout) override;
-    };
-        
+ public:
+  Stalk(float dt);
+  ~Stalk();
+
+  bool Harvest(int& payout) override;
+};
+
 #endif

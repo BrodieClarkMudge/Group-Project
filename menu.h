@@ -2,28 +2,27 @@
 #define MENU_H
 
 class Menu {
-    private:
-    bool soundFX = true;
-    float timeScale = 1.0f;
-    int selectedOption = 0;
+ private:
+  bool soundFX = true;
+  float timeScale = 1.0f;
+  int selectedOption = 0;
 
-    public:
-    void ShowMenu(Menu &menu);
+ public:
+  void ShowMenu(Menu& menu);
 
-    void setSoundFXTrue();
+  void setSoundFXTrue();
 
-    void setSoundFXFalse();
+  void setSoundFXFalse();
 
-    bool getSoundFX();
+  bool getSoundFX();
 
-    void setTimeScale(float time);
+  void setTimeScale(float time);
 
-    float getTimeScale();
+  float getTimeScale();
 
-    void setSelectedOption(int opt);
+  void setSelectedOption(int opt);
 
-    int getSelectedOption();
-
+  int getSelectedOption();
 };
 
 #endif

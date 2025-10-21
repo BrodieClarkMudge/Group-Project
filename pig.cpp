@@ -1,24 +1,22 @@
 #include "pig.h"
+
 #include <iostream>
 
 Pig::Pig(Texture2D pigText, Sound pigSound)
-    : Animal(pigText, "Pig", "Bacon", 150, 80, 100, 5, 5, 100, pigSound)
-{};
+    : Animal(pigText, "Pig", "Bacon", 150, 80, 100, 5, 5, 100, pigSound) {};
 
 void Pig::updateDaily() {
-    hunger += hungerConsumption;
-    thirst += thirstConsumption;
-    timeSinceFed++;
-    timeSinceLastProduction++;
+  hunger += hungerConsumption;
+  thirst += thirstConsumption;
+  timeSinceFed++;
+  timeSinceLastProduction++;
 
-    calculateHealth();
-    checkSurvival();
+  calculateHealth();
+  checkSurvival();
 
-    if (isAlive() && timeSinceLastProduction >= productionInterval) {
-        hasResourceReady = true;
-    }
+  if (isAlive() && timeSinceLastProduction >= productionInterval) {
+    hasResourceReady = true;
+  }
 }
 
-void Pig::makeSound() {
-    PlaySound(soundEffect);
-}
+void Pig::makeSound() { PlaySound(soundEffect); }

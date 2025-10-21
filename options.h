@@ -2,47 +2,46 @@
 #define OPTIONS_H
 
 class Options {
-    private:
-    bool soundFX = true;
-    float timeScale = 1.0f;
-    int selectedOption = 0;
-    bool optionsOpen = false;
-    bool draggingSlider = false;
-    float knobX;
+ private:
+  bool soundFX = true;
+  float timeScale = 1.0f;
+  int selectedOption = 0;
+  bool optionsOpen = false;
+  bool draggingSlider = false;
+  float knobX;
 
-    public:
-    void ShowOptions(Options &options);
+ public:
+  void ShowOptions(Options& options);
 
-    void setSoundFXTrue();
+  void setSoundFXTrue();
 
-    void setSoundFXFalse();
+  void setSoundFXFalse();
 
-    bool getSoundFX();
+  bool getSoundFX();
 
-    void setTimeScale(float time);
+  void setTimeScale(float time);
 
-    float getTimeScale();
+  float getTimeScale();
 
-    void setSelectedOption(int opt);
+  void setSelectedOption(int opt);
 
-    int getSelectedOption();
+  int getSelectedOption();
 
-    void setOptionsOpenTrue();
+  void setOptionsOpenTrue();
 
-    void setOptionsOpenFalse();
+  void setOptionsOpenFalse();
 
-    bool getOptionsOpen();
+  bool getOptionsOpen();
 
-    void setDraggingSliderTrue();
+  void setDraggingSliderTrue();
 
-    void setDraggingSliderFalse();
+  void setDraggingSliderFalse();
 
-    bool getDraggingSlider();
+  bool getDraggingSlider();
 
-    void setKnobX(float knobValue);
+  void setKnobX(float knobValue);
 
-    float getKnobX();
-
+  float getKnobX();
 };
 
 #endif

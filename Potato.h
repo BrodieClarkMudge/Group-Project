@@ -4,11 +4,11 @@
 #include "Stalk.h"
 
 class Potato : public Stalk {
-public:
-    Potato(float dt);
-    ~Potato();
+ public:
+  Potato(float dt);
+  ~Potato();
 
-    int GetSellPrice() override;
+  int GetSellPrice() override;
 };
 
 #endif

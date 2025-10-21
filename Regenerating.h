@@ -4,14 +4,15 @@
 #include "Crop.h"
 
 class Regenerating : public Crop {
-    protected:
-    int maxHarvests;
-    int totalHarvests;
-    public:
-    Regenerating(float dt);
-    ~Regenerating();
+ protected:
+  int maxHarvests;
+  int totalHarvests;
 
-    bool Harvest(int& payout) override;
+ public:
+  Regenerating(float dt);
+  ~Regenerating();
+
+  bool Harvest(int& payout) override;
 };
 
 #endif

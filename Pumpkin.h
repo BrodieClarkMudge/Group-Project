@@ -4,11 +4,11 @@
 #include "Withering.h"
 
 class Pumpkin : public Withering {
-public:
-    Pumpkin(float dt);
-    ~Pumpkin() override;
+ public:
+  Pumpkin(float dt);
+  ~Pumpkin() override;
 
-    int GetSellPrice() override;
+  int GetSellPrice() override;
 };
 
 #endif

@@ -1,4 +1,4 @@
-#include"Spring.h"
+#include "Spring.h"
 
 Spring::Spring() {
   name = "Spring";

@@ -1,4 +1,4 @@
-// WeatherSystem.cpp
+
 #include "WeatherSystem.h"
 
 #include <cstdlib>  // for rand()
@@ -9,7 +9,7 @@
 #include "Summer.h"
 #include "Winter.h"
 
-using namespace std;  
+using namespace std;
 
 WeatherSystem::WeatherSystem() {
   srand(time(NULL));                      // Seed random generator
@@ -44,12 +44,9 @@ void WeatherSystem::generateWeather() {
   currentWeather = "Clear";  // Fallback
 }
 
-
 string WeatherSystem::getCurrentWeather() const { return currentWeather; }
 
-
 Season* WeatherSystem::getCurrentSeason() const { return currentSeason.get(); }
-
 
 bool WeatherSystem::isRaining() const { return currentWeather == "Rain"; }
 
