@@ -8,93 +8,109 @@
 #include "raylib-cpp.hpp"
 
 int main() {
-  const int screenWidth = 420;
-  const int screenHeight = 320;
+  const int screenWidth = 680;
+  const int screenHeight = 240;
 
   raylib::Window window(screenWidth, screenHeight,
-                        "Weather Panel - Cozy Farm UI");
+                        "Weather Panel - BetterFarm++ UI");
   SetTargetFPS(60);
 
   WeatherSystem weatherSystem;
 
-  // Timing
   float dt = 0.0f;
   float dayTimer = 0.0f;
-  float cropTimer = 0.0f;
-
-  float dayLength = 12.0f;  // 1 in-game day = 12 real seconds
-  float growEvery = 6.0f;   //  crops grow every 6 seconds
-  float timeScale = 1.0f;   // speed up/slow down time if needed
+  float dayLength = 12.0f;
 
   // Colors
-  Color bg = {245, 243, 232, 255};
-  Color panel = {250, 250, 245, 255};
-  Color border = {200, 200, 180, 255};
-  Color iconCol = {60, 110, 180, 255};
-  Color textDark = {80, 80, 80, 255};
-  Color subText = {100, 90, 80, 255};
-  Color greenCol = {64, 145, 75, 255};
-  Color redCol = {180, 50, 50, 255};
+  Color bg = {235, 240, 245, 255};
+  Color panel = {255, 255, 255, 255};
+  Color shadow = {0, 0, 0, 15};
+  Color line = {235, 238, 245, 255};
+  Color label = {100, 110, 130, 255};
+  Color text = {45, 55, 75, 255};
+  Color blue = {70, 130, 220, 255};
+  Color green = {75, 180, 100, 255};
+  Color barBg = {235, 240, 250, 255};
 
   while (!window.ShouldClose()) {
-    //  Update timers
-    dt = GetFrameTime() * timeScale;
+    dt = GetFrameTime();
     dayTimer += dt;
 
-    //  apply season multiplier to crop growth
-    float multiplier = weatherSystem.getCurrentSeason()->getGrowthMultiplier();
-    cropTimer += dt * multiplier;
-
-    //  Advance to next day
     if (dayTimer >= dayLength) {
       weatherSystem.updateDaily();
       dayTimer = 0.0f;
     }
 
-    //  Trigger crop growth
-    if (cropTimer >= growEvery) {
-      // crop->Grow();  // integrate this with your real crop object
-      cropTimer = 0.0f;
-    }
-
     BeginDrawing();
     ClearBackground(bg);
 
-    // Main rounded panel
-    raylib::Rectangle panelRect(20, 30, 380, 230);
-    panelRect.DrawRounded(0.12f, 10, panel);
-    panelRect.DrawRoundedLines(0.12f, 10, 2, border);
+    // Panel shadow + main
+    raylib::Rectangle shadowRect(24, 24, 640, 180);
+    shadowRect.DrawRounded(0.12f, 20, shadow);
+    raylib::Rectangle panelRect(20, 20, 640, 180);
+    panelRect.DrawRounded(0.12f, 20, panel);
 
-    // Divider line
-    DrawLine(210, 50, 210, 240, border);
+    // Header
+    DrawText("WEATHER SYSTEM", 40, 35, 18, text);
+    DrawText(TextFormat("DAY %d", weatherSystem.getCurrentDay()), 560, 37, 15,
+             label);
+    DrawLine(30, 60, 650, 60, line);
 
-    //  LEFT SIDE: WEATHER 
-    std::string weather = weatherSystem.getCurrentWeather();
-    int weatherTextWidth = MeasureText(weather.c_str(), 28);
-    DrawText(weather.c_str(), 30 + (160 - weatherTextWidth) / 2, 100, 28,
-             textDark);
+    // Dividers
+    DrawLineEx({200, 75}, {200, 185}, 2, line);
+    DrawLineEx({380, 75}, {380, 185}, 2, line);
+    DrawLineEx({540, 75}, {540, 185}, 2, line);
 
-    std::string dayStr = "Day " + std::to_string(weatherSystem.getCurrentDay());
-    int dayWidth = MeasureText(dayStr.c_str(), 20);
-    DrawText(dayStr.c_str(), 30 + (160 - dayWidth) / 2, 145, 20, subText);
+    // Weather
+    DrawText(weatherSystem.getCurrentWeather().c_str(), 50, 85, 28, text);
+    DrawText("Current Condition", 50, 120, 13, label);
 
-    //  RIGHT SIDE: SEASON INFO 
+    // Season
     auto* season = weatherSystem.getCurrentSeason();
-    std::string seasonLabel = "Season: " + season->getName();
-    int seasonWidth = MeasureText(seasonLabel.c_str(), 22);
-    DrawText(seasonLabel.c_str(), 230 + (160 - seasonWidth) / 2, 80, 22,
-             iconCol);
+    std::string seasonName = season->getName();
+    Color seasonCol = blue;
+    if (seasonName == "Spring")
+      seasonCol = {100, 200, 120, 255};
+    else if (seasonName == "Summer")
+      seasonCol = {255, 180, 60, 255};
+    else if (seasonName == "Autumn")
+      seasonCol = {220, 120, 60, 255};
+    else if (seasonName == "Winter")
+      seasonCol = {100, 180, 240, 255};
 
-    DrawText(TextFormat("Growth x%.1f", season->getGrowthMultiplier()), 230,
-             130, 20, greenCol);
-    DrawText(TextFormat("Wither: %.0f%%", season->getWitheringChance() * 100),
-             230, 165, 20, redCol);
+    DrawText(seasonName.c_str(), 230, 85, 24, seasonCol);
+    DrawText("Season", 230, 115, 13, label);
+    DrawText(TextFormat("%d days left",
+                        season->getLength() - weatherSystem.getCurrentDay()),
+             230, 140, 16, text);
 
-    // FOOTER    
-    DrawText(
-        TextFormat("[Day: %.1fs | Crop: %.1fs x%.1f]", dayLength - dayTimer,
-                   growEvery - cropTimer, multiplier),
-        20, screenHeight - 30, 18, border);
+    // Growth
+    float growth = season->getGrowthMultiplier();
+    DrawText(TextFormat("%.1fx", growth), 410, 85, 28, green);
+    DrawText("Growth Rate", 410, 120, 13, label);
+
+    raylib::Rectangle gBarBg(410, 145, 100, 6);
+    gBarBg.DrawRounded(0.5f, 5, barBg);
+    raylib::Rectangle gBar(410, 145, 100 * (growth / 2.0f), 6);
+    gBar.DrawRounded(0.5f, 5, green);
+
+    // Timer
+    float timeLeft = dayLength - dayTimer;
+    DrawText(TextFormat("%.1fs", timeLeft), 570, 85, 26, text);
+    DrawText("Next Day", 570, 118, 13, label);
+
+    raylib::Rectangle tBarBg(570, 145, 70, 6);
+    tBarBg.DrawRounded(0.5f, 5, barBg);
+    raylib::Rectangle tBar(570, 145, 70 * (dayTimer / dayLength), 6);
+    tBar.DrawRounded(0.5f, 5, blue);
+
+    // Season progress bar
+    float seasonProg =
+        (float)weatherSystem.getCurrentDay() / season->getLength();
+    raylib::Rectangle sBg(30, 165, 620, 8);
+    sBg.DrawRounded(0.5f, 5, barBg);
+    raylib::Rectangle sBar(30, 165, 620 * seasonProg, 8);
+    sBar.DrawRounded(0.5f, 5, seasonCol);
 
     EndDrawing();
   }
