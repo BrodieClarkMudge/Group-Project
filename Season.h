@@ -12,7 +12,6 @@ class Season {
   int dayLength;
   double dayScale;
   float growthMultiplier;
-  float witheringChance;
   bool canRain;
   bool canSnow;
   std::map<std::string, float> weatherProbabilities;
@@ -32,8 +31,6 @@ class Season {
   // (e.g., 1.0 = normal growth, >1.0 = faster, <1.0 = slower)
   virtual float getGrowthMultiplier() const = 0;
 
-  // Returns the chance (0 to 1) that crops will wither each day in this season
-  virtual float getWitheringChance() const = 0;
 
   // Indicates whether this season supports rain events
   virtual bool canHaveRain() const = 0;
