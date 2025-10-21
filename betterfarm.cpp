@@ -20,11 +20,17 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include "WeatherSystem.h"
 
 // Timing global variables to be used in animals and crops
 float dt = 0.0f;
 float timeScale = 1.0f;
 float dehydrateTick = 0.0f;
+
+// weather / day system globals
+WeatherSystem weatherSystem;
+float dayTimer = 0.0f;
+float dayLength = 0.5f;
 
 int main() {
     const int initialWidth = 1280;
@@ -32,6 +38,7 @@ int main() {
     const float aspectRatio = 16.0f / 10.0f;
     const int barHeight = 60;
 
+    
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
  
     InitWindow(initialWidth, initialHeight, "BetterFarm++ OOP (unique_ptr)");
@@ -94,6 +101,16 @@ int main() {
     while (!WindowShouldClose()) {
         // Calculates time to be used in animals and crops
         dt = GetFrameTime() * timeScale;
+
+
+        // Day timer
+        dayTimer += dt;   
+    
+        if (dayTimer >= dayLength) {
+            weatherSystem.updateDaily();
+            currentDay++;
+            dayTimer = 0.0f;
+        }
 
         // Thirst drain over time
         static float thirstTick = 0.0f;
@@ -325,19 +342,28 @@ int main() {
                 }
                 // Crop on hoed - water
                 else if (t.getType() == TileType::HOED && t.hasCrop()) {
-                    water = water - (100 - t.getCrop()->getWaterAmount());
-                    t.getCrop()->Water();
-                    didWater = true;
-                }
+                    int current = t.getCrop()->getWaterAmount();
 
-                if (didWater) {
-                    t.setWateredGlow(2.0f);
-                    break;
+                    // INPUT VALIDATION - NEVER GOES NEGATIVE
+                    int need = 100 - current;
+                    if (need > 0 && water > 0) {
+                        int give;
+                         if (water < need) { 
+                            give = water;
+                         } 
+                         else {
+                            give = need;
+                        }   
+                        t.getCrop()->SetWaterAmount(current + give);
+                        water -= give;
+                        didWater = true;
+                    }
                 }
             }
         }
 
         // Water border logic before drawing starts
+        // this doesn't really work but oh well
         for (auto& t : tiles) {
             if (t.getWateredGlow() > 0.0f) {
                 t.setWateredGlow(t.getWateredGlow() - dt);
@@ -354,7 +380,7 @@ int main() {
             float waterDecayTimer = t.getWaterDecayTimer() + dt;
             t.setWaterDecayTimer(waterDecayTimer);
 
-            while (t.getWaterDecayTimer() >= 0.15f) {
+            while (t.getWaterDecayTimer() >= 1.0f) {
                 int w = t.getCrop()->getWaterAmount();
                 if (w > 0) {
                     w -= t.getCrop()->getWaterConsumption();
@@ -459,57 +485,106 @@ int main() {
             if (t.hasCrop()) {
                 float cropTimer = t.getCropTimer() + dt;
                 t.setCropTimer(cropTimer);
-                // grow every 5 secs if watered
-                float growEvery = 12.0f;
-                if (t.getCropTimer() >= growEvery && t.getCrop()->getWaterAmount() > 0) {
-                    t.getCrop()->Grow();
-                    t.setCropTimer(0.0f);
-                }
 
-                // to kill wither prone crops
-                if (t.getCrop()->IsWithering() && t.getCrop()->IsMature()) {
-                    float ripeTimer = t.getRipeTimer() + dt;
-                    t.setRipeTimer(ripeTimer);
-                    if (t.getRipeTimer() >= 5.0f) {
-                        t.removeCrop();
-                        continue;
+                
+            // CROP GROWTH -------------------------------------------------
+
+
+
+            // Get current season multiplier
+            float growthMultiplier =
+                weatherSystem.getCurrentSeason()->getGrowthMultiplier();
+
+            // weather-based growth effects
+            string currentWeather = weatherSystem.getCurrentWeather();
+
+            if (currentWeather == "Heatwave") {
+                growthMultiplier *= 0.2f;
+            }
+
+            if (currentWeather == "Fog") {
+                growthMultiplier *= 1.8f;
+            }
+
+
+            // 12 sec base time ----------------------------
+            float growEvery = 12.0f / growthMultiplier;
+
+            // time to grow met and watered then grow and reset timer
+            if (t.getCropTimer() >= growEvery && t.getCrop()->getWaterAmount() > 0) {
+                t.getCrop()->Grow();
+                t.setCropTimer(0.0f);
+            }
+            // to kill wither prone crops
+            if (t.getCrop()->IsWithering() && t.getCrop()->IsMature()) {
+                float ripeTimer = t.getRipeTimer() + dt;
+                t.setRipeTimer(ripeTimer);
+                if (t.getRipeTimer() >= 5.0f) {
+                    t.removeCrop();
+                    continue;
+                }
+            } else {
+                t.setRipeTimer(0.0f);
+            }
+
+            t.getCrop()->Draw(t.getRect());
+            }
+        }
+
+
+
+        // BAR AT THE BOTTOM AND INFO -------------------------------------
+
+        int weatherBarHeight = 70;
+        int weatherBarY = winHeight - weatherBarHeight;
+
+        DrawRectangle(0, weatherBarY, winWidth, weatherBarHeight,
+                    Color{40, 40, 40, 255});
+        DrawLine(0, weatherBarY, winWidth, weatherBarY, Color{80, 80, 80, 255});
+        // get all info
+        Season* season = weatherSystem.getCurrentSeason();
+        string seasonName = season->getName();
+        string currentWeather = weatherSystem.getCurrentWeather();
+        float growth = season->getGrowthMultiplier();
+        int daysLeft = season->getLength() - weatherSystem.getCurrentDay();
+
+        // Weather info on first line
+        string weatherInfo = TextFormat(
+            "Season: %s | Weather: %s | Growth: %.1fx | Days Left: %d",
+            seasonName.c_str(), currentWeather.c_str(), growth, daysLeft);
+
+        // write it inside the box
+        DrawText(weatherInfo.c_str(), 20, weatherBarY + 8, 18, RAYWHITE);
+
+        // Crop instructions on second line
+        DrawText("5:Tomato  6:Potato  7:Pumpkin  LMB:Plant/Harvest", 20,
+                weatherBarY + 35, 18, RAYWHITE);
+                Vector2 mousePos = GetMousePosition();
+
+                // Tile loop for various checks & functions --------------------------------------
+
+                for (auto& t : tiles) {
+                    if (t.hasAnimal() && CheckCollisionPointRec(mousePos, t.getRect())) {
+                        // Get the animal's state string
+                        string stateText = t.getAnimal()->getState();
+
+                        // Determine tooltip position
+                        float textWidth = MeasureText(stateText.c_str(), 14);
+                        float textHeight = 18;
+                        float tooltipX = mousePos.x + 10;
+                        float tooltipY = mousePos.y + 10;
+
+                        // Prevent tooltip from going off screen
+                        if (tooltipX + textWidth > GetScreenWidth()) tooltipX = GetScreenWidth() - textWidth - 10;
+                        if (tooltipY + textHeight > GetScreenHeight()) tooltipY = GetScreenHeight() - textHeight - 10;
+
+                        // Draw tooltip background
+                        DrawRectangle(tooltipX - 4, tooltipY - 4, textWidth + 8, textHeight + 8, Fade(BLACK, 0.8f));
+
+                        // Draw text
+                        DrawText(stateText.c_str(), tooltipX, tooltipY, 14, WHITE);
                     }
-                } else {
-                    t.setRipeTimer(0.0f);
                 }
-
-                t.getCrop()->Draw(t.getRect());
-            }
-        }
-
-        DrawText("5:Tomato  6:Potato  7:Pumpkin  LMB:Plant/Harvest", 20, winHeight - 60, 20, RAYWHITE);
-        DrawText("Arrow Up/Down: Resize Grid", 20, winHeight - 40, 20, RAYWHITE);
-        DrawText("BetterFarm++ OOP (16:10)", 20, winHeight - 20, 20, RAYWHITE);
-
-        Vector2 mousePos = GetMousePosition();
-
-        for (auto& t : tiles) {
-            if (t.hasAnimal() && CheckCollisionPointRec(mousePos, t.getRect())) {
-                // Get the animal's state string
-                string stateText = t.getAnimal()->getState();
-
-                // Determine tooltip position
-                float textWidth = MeasureText(stateText.c_str(), 14);
-                float textHeight = 18;
-                float tooltipX = mousePos.x + 10;
-                float tooltipY = mousePos.y + 10;
-
-                // Optional: prevent tooltip from going off screen
-                if (tooltipX + textWidth > GetScreenWidth()) tooltipX = GetScreenWidth() - textWidth - 10;
-                if (tooltipY + textHeight > GetScreenHeight()) tooltipY = GetScreenHeight() - textHeight - 10;
-
-                // Draw tooltip background
-                DrawRectangle(tooltipX - 4, tooltipY - 4, textWidth + 8, textHeight + 8, Fade(BLACK, 0.8f));
-
-                // Draw text
-                DrawText(stateText.c_str(), tooltipX, tooltipY, 14, WHITE);
-            }
-        }
 
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && CheckCollisionPointRec(mousePos, optionsBackground) && 
         ui.hoeing == false && shop.getOpen() == false && shop.getPlacing() == false) {
