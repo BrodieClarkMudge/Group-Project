@@ -17,6 +17,12 @@ FarmTextures LoadFarmTextures() {
     tex.chickenTex = LoadTexture("assets/chickenPixel.png");
     tex.pigTex     = LoadTexture("assets/pigPixel.png");
 
+
+    tex.cowSound = LoadSound("assets/cowSound.wav");
+    tex.sheepSound = LoadSound("assets/sheepSound.wav");
+    tex.chickenSound = LoadSound("assets/chickenSound.wav");
+    tex.pigSound = LoadSound("assets/pigSound.wav");
+
     return tex;
 }
 
@@ -33,4 +39,11 @@ void UnloadFarmTextures(FarmTextures& tex) {
     UnloadTexture(tex.sheepTex);
     UnloadTexture(tex.chickenTex);
     UnloadTexture(tex.pigTex);
+
+
+    UnloadSound(tex.cowSound);
+    UnloadSound(tex.sheepSound);
+    UnloadSound(tex.chickenSound);
+    UnloadSound(tex.pigSound);
+
 }

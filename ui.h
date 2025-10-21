@@ -41,6 +41,11 @@ struct FarmTextures {
     Texture2D sheepTex;
     Texture2D chickenTex;
     Texture2D pigTex;
+
+    Sound cowSound;
+    Sound pigSound;
+    Sound sheepSound;
+    Sound chickenSound;
 };
 
 FarmTextures LoadFarmTextures();

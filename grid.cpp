@@ -3,23 +3,19 @@
 void RebuildGrid(std::vector<Tile>& tiles, int cols, int rows,
                  int areaWidth, int gridHeight, int offsetX, int offsetY)
 {
-    // storage for old data
-    std::vector<std::unique_ptr<Animal>> oldAnimals;
-    std::vector<std::unique_ptr<Crop>> oldCrops;
-    std::vector<float> oldCropTimers;
-    std::vector<int> oldWaterCharges;
-
-    // make space
-    oldAnimals.reserve(tiles.size());
-    oldCrops.reserve(tiles.size());
-    oldCropTimers.reserve(tiles.size());
-    oldWaterCharges.reserve(tiles.size());
-    // save old before deleting
-    for (auto& tile : tiles) {
-        oldAnimals.push_back(std::move(tile.animal));
-        oldCrops.push_back(std::move(tile.crop));
-        oldCropTimers.push_back(tile.cropTimer);
-        oldWaterCharges.push_back(tile.waterCharges);
+// Save old tile data (type + animal + crops)
+struct TileData {
+    TileType type;
+    std::unique_ptr<Animal> animal;
+    std::unique_ptr<Crop> crop;
+    float cropTimer;
+    int waterCharges;
+};
+std::vector<TileData> oldTiles;
+oldTiles.reserve(tiles.size());
+for (auto& tile : tiles) {
+    oldTiles.push_back({ tile.type, std::move(tile.animal), std::move(tile.crop), tile.cropTimer, tile.waterCharges });
+}
     }
 
     tiles.clear();
@@ -35,15 +31,15 @@ void RebuildGrid(std::vector<Tile>& tiles, int cols, int rows,
                        tileWidth, tileHeight };
 
             int index = y * cols + x;
-
-            if (index < static_cast<int>(oldAnimals.size())) {
-                t.animal = std::move(oldAnimals[index]);
-            }
-            if (index < static_cast<int>(oldCrops.size())) {
-                t.crop = std::move(oldCrops[index]);
-                t.cropTimer = oldCropTimers[index];
-                t.waterCharges = oldWaterCharges[index];
-            }
+if (index < static_cast<int>(oldTiles.size())) {
+    t.type = oldTiles[index].type;
+    t.animal = std::move(oldTiles[index].animal);
+    t.crop = std::move(oldTiles[index].crop);
+    t.cropTimer = oldTiles[index].cropTimer;
+    t.waterCharges = oldTiles[index].waterCharges;
+} else {
+    t.type = TileType::GRASS; // default
+}
 
             tiles.push_back(std::move(t));
         }
@@ -68,19 +64,17 @@ void ExpandGrid(std::vector<Tile>& tiles, int oldCols, int oldRows,
                        tileWidth, tileHeight };
 
             if (x < oldCols && y < oldRows) {
-                auto& old = tiles[y * oldCols + x];
-                t.animal= std::move(old.animal); 
-                t.crop= std::move(old.crop);
-                t.cropTimer = old.cropTimer;
-                t.type= old.type;
+    Tile& oldTile = tiles[y * oldCols + x];
+    t.type = oldTile.type;
+    t.animal = std::move(oldTile.animal);
+    t.crop = std::move(oldTile.crop);
+    t.cropTimer = oldTile.cropTimer;
+    t.waterCharges = oldTile.waterCharges;
+} else {
+    t.type = TileType::GRASS; // default
+}
 
-                t.waterCharges = old.waterCharges;
-                t.wateredGlow = old.wateredGlow;
-                t.waterDecayTimer = old.waterDecayTimer;
-
-            } 
-
-            newTiles.push_back(std::move(t));  // push for every new
+newTiles.push_back(std::move(t));
         }
     }
 

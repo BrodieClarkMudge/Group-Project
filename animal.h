@@ -25,6 +25,9 @@ class Animal {
     int timeSinceLastProduction;
     bool hasResourceReady;
 
+    Sound soundEffect;
+    float soundCooldown = 0;
+
     void calculateHealth();
     void checkSurvival();
 
@@ -33,7 +36,7 @@ class Animal {
     Animal();
     Animal(Texture2D texture, string type, string resource,
     int mHealth, int mHunger, int mThirst, int consHunger,
-    int consThirst, int prodInt);
+    int consThirst, int prodInt, Sound soundFX);
 
     virtual ~Animal();
 
@@ -53,9 +56,11 @@ class Animal {
     void collectResource();
     bool hasResourceAvailable();
 
-    void setTexture(Texture2D sprite);
-    void draw(float x, float y, float width, float height);
-    void setThirst(int);
+void setTexture(Texture2D sprite);
+void draw(float x, float y, float width, float height);
+void setThirst(int);
+virtual void makeSound();
+void updateSoundTimer(float timeChange);
 };
 
 #endif //ANIMAL_H

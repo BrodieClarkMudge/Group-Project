@@ -1,10 +1,10 @@
 #include "sheep.h"
 #include <iostream>
 
-Sheep::Sheep(Texture2D sheepText)
-    : Animal(sheepText, "Sheep", "Wool", 100, 80, 100, 5, 5, 100)
+Sheep::Sheep(Texture2D sheepText, Sound sheepSound)
+    : Animal(sheepText, "Sheep", "Wool", 100, 80, 100, 5, 5, 100, sheepSound)
 {};
-/*
+
 void Sheep::updateDaily() {
     hunger += hungerConsumption;
     thirst += waterConsumption;
@@ -18,5 +18,7 @@ void Sheep::updateDaily() {
         hasResourceReady = true;
     }
 }
-    */
 
+void Sheep::makeSound() {
+    PlaySound(soundEffect);
+}

@@ -7,10 +7,14 @@ Animal::Animal(){
 }
 
 Animal::Animal(Texture2D texture, string type, string resource,
-    int mHealth, int mHunger, int mThirst, int consThirst, int consHunger, int prodInt) {
+    int mHealth, int mHunger, int mThirst, int consHunger,
+    int consThirst, int prodInt, Sound soundFX) {
     species = type;
     sprite = texture;
     health = mHealth;
+    thirstConsumption = consThirst;
+    hungerConsumption = consHunger;
+    thirstConsumption = consThirst;
     hunger = 0;
     thirst = 0;
     maxThirst = 100;
@@ -24,6 +28,7 @@ Animal::Animal(Texture2D texture, string type, string resource,
     timeSinceFed = 0;
     timeSinceLastProduction = 0;
     hasResourceReady = false;
+    soundEffect = soundFX;
 
 }
 
@@ -131,17 +136,36 @@ void Animal::draw(float x, float y, float width, float height) {
 }
 
 
-void Animal::drink() {
-    thirst = maxThirst;
-    thirst = 100;
+void Animal::updateDaily() {};
+
+void Animal::makeSound() {
+    PlaySound(soundEffect);
 }
 
-int Animal::getThirst() {
-    return thirst;
-}
-
-void Animal::setThirst(int x) {
-    if (thirst != 0) {
-    thirst = x;
+void Animal::updateSoundTimer(float timeChange) {
+        if (soundCooldown > 0) {
+            soundCooldown -= timeChange;
+        } else {
+            // Random chance to play
+            if (GetRandomValue(0, 100) < 20) { // 20% chance
+                makeSound();
+            }
+            // Reset cooldown to random between 3-10 seconds
+            soundCooldown = GetRandomValue(3000, 10000) / 1000.0f;
+        }
     }
-}
+
+    void Animal::drink() {
+        thirst = maxThirst;
+        thirst = 100;
+    }
+    
+    int Animal::getThirst() {
+        return thirst;
+    }
+    
+    void Animal::setThirst(int x) {
+        if (thirst != 0) {
+        thirst = x;
+        }
+    }
