@@ -89,19 +89,19 @@ std::string Crop::getState()
     switch (stage)
     {
     case SEED:
-        oss << ", Stage: Seed";
+        oss << "Stage: Seed";
         break;
     case SEMI1:
-        oss << ", Stage: Sprout";
+        oss << "Stage: Sprout";
         break;
     case SEMI2:
-        oss << ", Stage: Mid";
+        oss << "Stage: Mid";
         break;
     case FULL:
-        oss << ", Stage: Full";
+        oss << "Stage: Full";
         break;
     default:
-        oss << ", Stage: Unknown";
+        oss << "Stage: Unknown";
         break;
     }
 
