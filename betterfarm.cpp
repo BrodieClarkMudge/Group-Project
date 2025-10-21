@@ -277,16 +277,18 @@ int main() {
                             t.setCropTimer(0.0f);
                         }
 
-                        // temp hardcoded
+
 
                     } else {
                         // Plant selected crop
+                        bool planted = false; 
                         switch (selectedCrop) {
                             case SelectedCrop::TOMATO: {
                                 // INPUT VALIDATION - CAN'T BUY IF DON'T HAVE ENOUGH
                                 if (ui.coins >= tomatoCost) {
                                     ui.coins -= tomatoCost;
                                     t.setCrop(std::make_unique<Tomato>(0.0));
+                                    planted = true;  
                                 }
                                 break;
                             }
@@ -294,6 +296,7 @@ int main() {
                                 if (ui.coins >= potatoCost) {
                                     ui.coins -= potatoCost;
                                     t.setCrop(std::make_unique<Potato>(0.0));
+                                    planted = true;  
                                 }
                                 break;
                             }
@@ -301,6 +304,7 @@ int main() {
                                 if (ui.coins >= pumpkinCost) {
                                     ui.coins -= pumpkinCost;
                                     t.setCrop(std::make_unique<Pumpkin>(0.0));
+                                    planted = true;  
                                 }
                                 break;
                             }
@@ -308,27 +312,30 @@ int main() {
                         
 
                         // Assign crop textures based on type
-                        switch (selectedCrop) {
-                            case SelectedCrop::TOMATO:
-                                t.getCrop()->SetTexture(SEED,  tomatoSeed);
-                                t.getCrop()->SetTexture(SEMI1, tomatoSprout);
-                                t.getCrop()->SetTexture(SEMI2, tomatoMid);
-                                t.getCrop()->SetTexture(FULL,  tomatoFull);
-                                break;
-                            case SelectedCrop::POTATO:
-                                t.getCrop()->SetTexture(SEED,  potatoSeed);
-                                t.getCrop()->SetTexture(SEMI1, potatoSprout);
-                                t.getCrop()->SetTexture(SEMI2, potatoMid);
-                                t.getCrop()->SetTexture(FULL,  potatoFull);
-                                break;
-                            case SelectedCrop::PUMPKIN:
-                                t.getCrop()->SetTexture(SEED,  pumpkinSeed);
-                                t.getCrop()->SetTexture(SEMI1, pumpkinSprout);
-                                t.getCrop()->SetTexture(SEMI2, pumpkinMid);
-                                t.getCrop()->SetTexture(FULL,  pumpkinFull);
-                                break;
-                        }
-                        t.setCropTimer(0.0f);
+                        // needs this check to prevent creation without planting
+                        if (planted && t.hasCrop()) {
+                            switch (selectedCrop) {
+                                case SelectedCrop::TOMATO:
+                                    t.getCrop()->SetTexture(SEED,  tomatoSeed);
+                                    t.getCrop()->SetTexture(SEMI1, tomatoSprout);
+                                    t.getCrop()->SetTexture(SEMI2, tomatoMid);
+                                    t.getCrop()->SetTexture(FULL,  tomatoFull);
+                                    break;
+                                case SelectedCrop::POTATO:
+                                    t.getCrop()->SetTexture(SEED,  potatoSeed);
+                                    t.getCrop()->SetTexture(SEMI1, potatoSprout);
+                                    t.getCrop()->SetTexture(SEMI2, potatoMid);
+                                    t.getCrop()->SetTexture(FULL,  potatoFull);
+                                    break;
+                                case SelectedCrop::PUMPKIN:
+                                    t.getCrop()->SetTexture(SEED,  pumpkinSeed);
+                                    t.getCrop()->SetTexture(SEMI1, pumpkinSprout);
+                                    t.getCrop()->SetTexture(SEMI2, pumpkinMid);
+                                    t.getCrop()->SetTexture(FULL,  pumpkinFull);
+                                    break;
+                            }
+                            t.setCropTimer(0.0f);
+                        }  
                     }
                 }
             }
@@ -386,6 +393,7 @@ int main() {
 
         // Water border logic before drawing starts
         // this doesn't really work but oh well
+        /*
         for (auto& t : tiles) {
             if (t.getWateredGlow() > 0.0f) {
                 t.setWateredGlow(t.getWateredGlow() - dt);
@@ -394,6 +402,7 @@ int main() {
                 }
             }
         }
+        */
 
         // Water decay for crops
         for (auto& t : tiles) {
@@ -478,9 +487,12 @@ int main() {
             DrawRectangleLinesEx(t.getRect(), 1, BLACK);
 
             // Watering borders
+            /*
             if (t.getWateredGlow() > 0.0f) {
                 DrawRectangleLinesEx(t.getRect(), 2, SKYBLUE);
             }
+            */
+            
 
             // Animals: blue square = not thirsty, red = thirsty about to take dmg
             if (t.hasAnimal()) {
@@ -505,8 +517,12 @@ int main() {
 
             // CROPS
             if (t.hasCrop()) {
+                // make actual timer FLAG FLAG FLAG
                 float cropTimer = t.getCropTimer() + dt;
-                t.setCropTimer(cropTimer);
+                t.setCropTimer(cropTimer);     
+                
+                
+
 
                 
             // CROP GROWTH -------------------------------------------------
@@ -548,8 +564,10 @@ int main() {
             } else {
                 t.setRipeTimer(0.0f);
             }
-
-            t.getCrop()->Draw(t.getRect());
+                // check if null
+                if (t.getCrop() != nullptr) {  
+                    t.getCrop()->Draw(t.getRect());
+                }
             }
         }
 
